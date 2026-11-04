@@ -1,0 +1,514 @@
+/* SOR SENTINEL — Global Design System
+   Dark navy/charcoal industrial aesthetic with cyan and violet accents */
+
+@import './fonts.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Colors */
+  --color-bg-primary: #0a0f1a;
+  --color-bg-secondary: #0f1629;
+  --color-bg-card: #131d35;
+  --color-bg-elevated: #1a2540;
+  --color-bg-input: #0f1629;
+  --color-border: #1e2d4f;
+  --color-border-light: #253556;
+
+  --color-cyan: #00d4ff;
+  --color-cyan-dim: #00a8cc;
+  --color-cyan-muted: rgba(0, 212, 255, 0.12);
+  --color-violet: #7c3aed;
+  --color-violet-dim: #6d28d9;
+  --color-violet-muted: rgba(124, 58, 237, 0.15);
+
+  --color-text-primary: #e8edf5;
+  --color-text-secondary: #8fa3bf;
+  --color-text-muted: #4a6180;
+  --color-text-accent: #00d4ff;
+
+  --color-success: #10b981;
+  --color-success-muted: rgba(16, 185, 129, 0.15);
+  --color-warning: #f59e0b;
+  --color-warning-muted: rgba(245, 158, 11, 0.15);
+  --color-error: #ef4444;
+  --color-error-muted: rgba(239, 68, 68, 0.15);
+  --color-info: #3b82f6;
+  --color-info-muted: rgba(59, 130, 246, 0.15);
+
+  /* ── Typography System — Exactly 5 Fonts ────────────────────────── */
+  /* 1. Space Grotesk: Primary page headings, dashboard titles, major section headings, prominent metric values */
+  --font-space-grotesk: 'Space Grotesk', -apple-system, sans-serif;
+  --font-heading: var(--font-space-grotesk);
+
+  /* 2. Sora: SOR SENTINEL brand wordmark, hero headings, selected high-visibility titles */
+  --font-sora: 'Sora', -apple-system, sans-serif;
+  --font-brand: var(--font-sora);
+
+  /* 3. Outfit: Navigation labels, buttons, tabs, badges, interactive UI controls */
+  --font-outfit: 'Outfit', -apple-system, sans-serif;
+  --font-ui: var(--font-outfit);
+
+  /* 4. IBM Plex Sans: Body text, descriptions, forms, tables, settings pages, information-dense content */
+  --font-ibm-plex: 'IBM Plex Sans', -apple-system, sans-serif;
+  --font-body: var(--font-ibm-plex);
+  --font-family: var(--font-ibm-plex);
+
+  /* 5. Rajdhani: Cybersecurity labels, risk classifications, status indicators, small uppercase section tags */
+  --font-rajdhani: 'Rajdhani', -apple-system, sans-serif;
+  --font-cyber: var(--font-rajdhani);
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
+  --shadow-glow-cyan: 0 0 20px rgba(0, 212, 255, 0.15);
+  --shadow-glow-violet: 0 0 20px rgba(124, 58, 237, 0.2);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Sidebar */
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 64px;
+  --topbar-height: 64px;
+}
+
+/* ── Reset & Base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Typography Roles ─────────────────────────────────────────────────────── */
+/* 1. Space Grotesk: Primary Page & Section Headings, Metric Values */
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}
+
+h4, h5, h6 {
+  font-family: var(--font-heading);
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: clamp(1.75rem, 4vw, 2.75rem); }
+h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
+h3 { font-size: clamp(1.25rem, 2.5vw, 1.75rem); }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.1rem; }
+h6 { font-size: 1rem; }
+
+/* 3. Outfit: Buttons, Tabs, Badges & Interactive UI Elements */
+button, .btn, [role="button"], input[type="submit"], input[type="button"], nav a, .nav-link, .tab-btn {
+  font-family: var(--font-ui);
+}
+
+/* 4. IBM Plex Sans: Body Text, Paragraphs, Forms, Tables, Settings Content */
+p, span, li, blockquote {
+  font-family: inherit;
+}
+
+p { color: var(--color-text-secondary); line-height: 1.7; }
+
+input, textarea, select, table, th, td, label {
+  font-family: var(--font-body);
+}
+
+/* 5. Rajdhani: Cyber Tags, Risk Levels, Status Indicators, Section Labels */
+.font-cyber, .cyber-badge, .risk-tag, .status-indicator, [data-cyber-label] {
+  font-family: var(--font-cyber);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Utility Font Helpers */
+.font-space { font-family: var(--font-space-grotesk) !important; }
+.font-sora { font-family: var(--font-sora) !important; }
+.font-outfit { font-family: var(--font-outfit) !important; }
+.font-plex { font-family: var(--font-ibm-plex) !important; }
+.font-rajdhani { font-family: var(--font-rajdhani) !important; }
+
+a {
+  color: var(--color-cyan);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover { color: var(--color-text-primary); }
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--color-border-light); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+
+/* ── Focus Styles ─────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Selection ────────────────────────────────────────────────────────────── */
+::selection {
+  background: var(--color-cyan-muted);
+  color: var(--color-text-primary);
+}
+
+/* ── Utility Classes ─────────────────────────────────────────────────────── */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-cyan), var(--color-violet));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+.badge-success { background: var(--color-success-muted); color: var(--color-success); }
+.badge-warning { background: var(--color-warning-muted); color: var(--color-warning); }
+.badge-error   { background: var(--color-error-muted);   color: var(--color-error); }
+.badge-info    { background: var(--color-info-muted);    color: var(--color-info); }
+.badge-cyan    { background: var(--color-cyan-muted);    color: var(--color-cyan); }
+.badge-violet  { background: var(--color-violet-muted);  color: #a78bfa; }
+.badge-neutral { background: rgba(255,255,255,0.06);      color: var(--color-text-secondary); }
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(0, 212, 255, 0.2); }
+  50%       { box-shadow: 0 0 20px rgba(0, 212, 255, 0.4); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.animate-fade-in { animation: fadeIn 0.4s ease both; }
+.animate-spin    { animation: spin 1s linear infinite; }
+
+/* ── Skeleton Loading ────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-elevated) 25%,
+    var(--color-bg-card) 50%,
+    var(--color-bg-elevated) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .container { padding: 0 var(--spacing-md); }
+}
+
+/* ── Light Theme Overrides (html[data-theme="light"]) ────────────────────── */
+html[data-theme="light"] {
+  --color-bg-primary: #f8fafc;
+  --color-bg-secondary: #ffffff;
+  --color-bg-card: #ffffff;
+  --color-bg-elevated: #f1f5f9;
+  --color-bg-input: #ffffff;
+  --color-border: #e2e8f0;
+  --color-border-light: #cbd5e1;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748b;
+}
+
+html[data-theme="light"] body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Background utilities */
+html[data-theme="light"] .bg-\[\#0a0f1a\] {
+  background-color: #f8fafc !important;
+}
+
+html[data-theme="light"] .bg-\[\#0f1629\] {
+  background-color: #ffffff !important;
+}
+
+html[data-theme="light"] .bg-\[\#131d35\] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .bg-\[\#0e172a\] {
+  background-color: #f1f5f9 !important;
+}
+
+/* Border utilities */
+html[data-theme="light"] .border-\[\#1e2d4f\] {
+  border-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .divide-\[\#1e2d4f\] > * + * {
+  border-color: #e2e8f0 !important;
+}
+
+/* Text color utilities */
+html[data-theme="light"] .text-\[\#e8edf5\],
+html[data-theme="light"] .text-white {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .text-\[\#8fa3bf\],
+html[data-theme="light"] .text-slate-400 {
+  color: #475569 !important;
+}
+
+html[data-theme="light"] .text-\[\#4a6180\],
+html[data-theme="light"] .text-slate-500 {
+  color: #64748b !important;
+}
+
+/* Form controls in light mode */
+html[data-theme="light"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="light"] textarea,
+html[data-theme="light"] select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Hover and table utilities */
+html[data-theme="light"] .hover\:bg-white\/5:hover {
+  background-color: #f1f5f9 !important;
+}
+
+html[data-theme="light"] .hover\:bg-white\/2:hover {
+  background-color: #f8fafc !important;
+}
+
+html[data-theme="light"] .bg-white\/6 {
+  background-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+/* Complete Dark Mode (Deep Charcoal / OLED Dark) */
+html[data-theme="dark"] {
+  --color-bg-primary: #030712;
+  --color-bg-secondary: #0b0f19;
+  --color-bg-card: #111827;
+  --color-bg-elevated: #162032;
+  --color-bg-input: #0b0f19;
+  --color-border: #1f2937;
+  --color-border-light: #374151;
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-text-muted: #6b7280;
+}
+
+html[data-theme="dark"] body {
+  background-color: #030712 !important;
+  color: #f9fafb !important;
+}
+
+html[data-theme="dark"] .bg-\[\#0a0f1a\] {
+  background-color: #030712 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#0f1629\] {
+  background-color: #0b0f19 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#131d35\] {
+  background-color: #111827 !important;
+  border-color: #1f2937 !important;
+}
+
+html[data-theme="dark"] .border-\[\#1e2d4f\] {
+  border-color: #1f2937 !important;
+}
+
+/* ── Print & Export Optimization ─────────────────────────────────────────── */
+@media print {
+  /* Hide interactive chrome, buttons, modals, sidebars */
+  nav,
+  aside,
+  header,
+  footer,
+  button,
+  .no-print,
+  [role="dialog"],
+  .toaster {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Reset dark container backgrounds to clean printable white */
+  .bg-\[\#0a0f1a\],
+  .bg-\[\#0f1629\],
+  .bg-\[\#131d35\],
+  .bg-\[\#0c1427\],
+  .bg-gradient-to-r {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+  }
+
+  .text-\[\#e8edf5\],
+  .text-white {
+    color: #0f172a !important;
+  }
+
+  .text-\[\#8fa3bf\],
+  .text-\[\#4a6180\] {
+    color: #475569 !important;
+  }
+
+  .border,
+  .border-\[\#1e2d4f\],
+  .border-\[\#253556\] {
+    border-color: #cbd5e1 !important;
+  }
+
+  /* Prevent page breaks inside cards */
+  .rounded-2xl,
+  .rounded-xl {
+    border: 1px solid #cbd5e1 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 12pt !important;
+  }
+
+  /* Allow long text to wrap naturally across lines and pages */
+  p, pre, code, span, td, th {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Table styling in print */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    padding: 6pt 8pt !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+  }
+
+  @page {
+    margin: 1.5cm;
+    size: A4 portrait;
+  }
+}
+
