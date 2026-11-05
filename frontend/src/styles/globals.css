@@ -92,6 +92,29 @@
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 64px;
   --topbar-height: 64px;
+
+  /* Brand Logo Variables — Cyber Navy Default */
+  --brand-emblem-aura-start: #00d4ff;
+  --brand-emblem-aura-mid: #0284c7;
+  --brand-shield-stroke-1: #7dd3fc;
+  --brand-shield-stroke-2: #00d4ff;
+  --brand-shield-stroke-3: #0284c7;
+  --brand-shield-fill-1: #0a1529;
+  --brand-shield-fill-2: #040914;
+  --brand-lock-fill-1: #67e8f9;
+  --brand-lock-fill-2: #38bdf8;
+  --brand-inner-contour: #00d4ff;
+  --brand-lock-shackle: #e0f2fe;
+  --brand-lock-stroke: #bae6fd;
+  --brand-keyhole: #040914;
+  --brand-filter-shadow: drop-shadow(0 0 12px rgba(0, 212, 255, 0.55));
+  --brand-wordmark-sor: #ffffff;
+  --brand-wordmark-sentinel: #22d3ee;
+  --brand-subtext: #8fa3bf;
+  --brand-divider: #253556;
+  --brand-badge-text: #22d3ee;
+  --brand-badge-border: rgba(34, 211, 238, 0.5);
+  --brand-badge-bg: rgba(6, 182, 212, 0.1);
 }
 
 /* ── Reset & Base ─────────────────────────────────────────────────────────── */
@@ -279,6 +302,92 @@ a:hover { color: var(--color-text-primary); }
 .animate-fade-in { animation: fadeIn 0.4s ease both; }
 .animate-spin    { animation: spin 1s linear infinite; }
 
+/* ── Profile Banner Animations ───────────────────────────────────────────── */
+@keyframes matrixRain {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes waveFlowSlow {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes waveFlowFast {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes floatCube1 {
+  0%, 100% { transform: translateY(0) rotate(12deg); }
+  50%      { transform: translateY(-14px) rotate(24deg); }
+}
+
+@keyframes floatCube2 {
+  0%, 100% { transform: translateY(0) rotate(-15deg); }
+  50%      { transform: translateY(-20px) rotate(-5deg); }
+}
+
+@keyframes floatParticle {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  50%      { transform: translate(10px, -15px) scale(1.15); opacity: 0.9; }
+}
+
+.animate-matrix-rain {
+  animation: matrixRain 6s linear infinite;
+}
+
+.animate-wave-slow {
+  animation: waveFlowSlow 14s linear infinite;
+}
+
+.animate-wave-fast {
+  animation: waveFlowFast 8s linear infinite;
+}
+
+.animate-float-cube1 {
+  animation: floatCube1 5s ease-in-out infinite;
+}
+
+.animate-float-cube2 {
+  animation: floatCube2 6.5s ease-in-out infinite;
+}
+
+.animate-float-particle {
+  animation: floatParticle 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-matrix-rain,
+  .animate-wave-slow,
+  .animate-wave-fast,
+  .animate-float-cube1,
+  .animate-float-cube2,
+  .animate-float-particle {
+    animation: none !important;
+  }
+}
+
+/* ── Numeric Typography (Times New Roman) ────────────────────────────────── */
+.font-numeric,
+.font-times,
+.stat-number,
+.metric-value,
+.numeric-text {
+  font-family: 'Times New Roman', Times, serif !important;
+}
+
+/* Ensure chart axis ticks, labels, legends, and tooltips use Times New Roman */
+.recharts-text,
+.recharts-cartesian-axis-tick-value,
+.recharts-legend-item-text,
+.recharts-pie-label-text,
+.recharts-tooltip-item-value,
+.recharts-tooltip-item-name,
+.recharts-default-tooltip {
+  font-family: 'Times New Roman', Times, serif !important;
+}
+
 /* ── Skeleton Loading ────────────────────────────────────────────────────── */
 .skeleton {
   background: linear-gradient(
@@ -297,130 +406,884 @@ a:hover { color: var(--color-text-primary); }
   .container { padding: 0 var(--spacing-md); }
 }
 
-/* ── Light Theme Overrides (html[data-theme="light"]) ────────────────────── */
-html[data-theme="light"] {
-  --color-bg-primary: #f8fafc;
-  --color-bg-secondary: #ffffff;
-  --color-bg-card: #ffffff;
-  --color-bg-elevated: #f1f5f9;
-  --color-bg-input: #ffffff;
-  --color-border: #e2e8f0;
-  --color-border-light: #cbd5e1;
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-muted: #64748b;
-}
-
-html[data-theme="light"] body {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
-}
-
-/* Background utilities */
-html[data-theme="light"] .bg-\[\#0a0f1a\] {
-  background-color: #f8fafc !important;
-}
-
-html[data-theme="light"] .bg-\[\#0f1629\] {
-  background-color: #ffffff !important;
-}
-
-html[data-theme="light"] .bg-\[\#131d35\] {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-}
-
-html[data-theme="light"] .bg-\[\#0e172a\] {
-  background-color: #f1f5f9 !important;
-}
-
-/* Border utilities */
-html[data-theme="light"] .border-\[\#1e2d4f\] {
-  border-color: #e2e8f0 !important;
-}
-
-html[data-theme="light"] .divide-\[\#1e2d4f\] > * + * {
-  border-color: #e2e8f0 !important;
-}
-
-/* Text color utilities */
-html[data-theme="light"] .text-\[\#e8edf5\],
-html[data-theme="light"] .text-white {
-  color: #0f172a !important;
-}
-
-html[data-theme="light"] .text-\[\#8fa3bf\],
-html[data-theme="light"] .text-slate-400 {
-  color: #475569 !important;
-}
-
-html[data-theme="light"] .text-\[\#4a6180\],
-html[data-theme="light"] .text-slate-500 {
-  color: #64748b !important;
-}
-
-/* Form controls in light mode */
-html[data-theme="light"] input:not([type="checkbox"]):not([type="radio"]),
-html[data-theme="light"] textarea,
-html[data-theme="light"] select {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: #cbd5e1 !important;
-}
-
-html[data-theme="light"] input::placeholder,
-html[data-theme="light"] textarea::placeholder {
-  color: #94a3b8 !important;
-}
-
-/* Hover and table utilities */
-html[data-theme="light"] .hover\:bg-white\/5:hover {
-  background-color: #f1f5f9 !important;
-}
-
-html[data-theme="light"] .hover\:bg-white\/2:hover {
-  background-color: #f8fafc !important;
-}
-
-html[data-theme="light"] .bg-white\/6 {
-  background-color: #e2e8f0 !important;
-  color: #334155 !important;
-}
-
-/* Complete Dark Mode (Deep Charcoal / OLED Dark) */
-html[data-theme="dark"] {
-  --color-bg-primary: #030712;
-  --color-bg-secondary: #0b0f19;
+/* ── Midnight Enterprise Theme (html[data-theme="midnight"]) ─────────────── */
+html[data-theme="midnight"] {
+  --color-bg-primary: #080B12;
+  --color-bg-secondary: #0D1320;
   --color-bg-card: #111827;
-  --color-bg-elevated: #162032;
-  --color-bg-input: #0b0f19;
-  --color-border: #1f2937;
-  --color-border-light: #374151;
-  --color-text-primary: #f9fafb;
-  --color-text-secondary: #9ca3af;
-  --color-text-muted: #6b7280;
+  --color-bg-elevated: #172033;
+  --color-bg-input: #0D1320;
+  --color-border: #263449;
+  --color-border-light: #1E293B;
+
+  --color-cyan: #06B6D4;
+  --color-cyan-dim: #0891B2;
+  --color-cyan-muted: rgba(6, 182, 212, 0.12);
+  --color-violet: #6366F1;
+  --color-violet-dim: #4F46E5;
+  --color-violet-muted: rgba(99, 102, 241, 0.15);
+
+  --color-text-primary: #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+  --color-text-accent: #06B6D4;
+
+  --color-success: #10B981;
+  --color-success-muted: rgba(16, 185, 129, 0.15);
+  --color-warning: #F59E0B;
+  --color-warning-muted: rgba(245, 158, 11, 0.15);
+  --color-error: #EF4444;
+  --color-error-muted: rgba(239, 68, 68, 0.15);
+  --color-info: #38BDF8;
+  --color-info-muted: rgba(56, 189, 248, 0.15);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.7);
+  --shadow-glow-cyan: 0 0 20px rgba(6, 182, 212, 0.18);
+
+  /* Brand Logo Variables — Midnight Enterprise */
+  --brand-emblem-aura-start: #06b6d4;
+  --brand-emblem-aura-mid: #0284c7;
+  --brand-shield-stroke-1: #38bdf8;
+  --brand-shield-stroke-2: #06b6d4;
+  --brand-shield-stroke-3: #0284c7;
+  --brand-shield-fill-1: #080b12;
+  --brand-shield-fill-2: #05080f;
+  --brand-lock-fill-1: #22d3ee;
+  --brand-lock-fill-2: #06b6d4;
+  --brand-inner-contour: #06b6d4;
+  --brand-lock-shackle: #e2e8f0;
+  --brand-lock-stroke: #7dd3fc;
+  --brand-keyhole: #05080f;
+  --brand-filter-shadow: drop-shadow(0 0 12px rgba(6, 182, 212, 0.4));
+  --brand-wordmark-sor: #f1f5f9;
+  --brand-wordmark-sentinel: #06b6d4;
+  --brand-subtext: #94a3b8;
+  --brand-divider: #263449;
+  --brand-badge-text: #06b6d4;
+  --brand-badge-border: rgba(6, 182, 212, 0.5);
+  --brand-badge-bg: rgba(6, 182, 212, 0.1);
 }
 
-html[data-theme="dark"] body {
-  background-color: #030712 !important;
-  color: #f9fafb !important;
+html[data-theme="midnight"] body {
+  background-color: #080B12 !important;
+  color: #F1F5F9 !important;
 }
 
-html[data-theme="dark"] .bg-\[\#0a0f1a\] {
-  background-color: #030712 !important;
+/* Background utilities in Midnight Enterprise */
+html[data-theme="midnight"] .bg-\[\#0a0f1a\] {
+  background-color: #080B12 !important;
 }
 
-html[data-theme="dark"] .bg-\[\#0f1629\] {
-  background-color: #0b0f19 !important;
+html[data-theme="midnight"] .bg-\[\#0f1629\] {
+  background-color: #0D1320 !important;
 }
 
-html[data-theme="dark"] .bg-\[\#131d35\] {
+html[data-theme="midnight"] .bg-\[\#131d35\] {
   background-color: #111827 !important;
-  border-color: #1f2937 !important;
+  border-color: #263449 !important;
 }
 
-html[data-theme="dark"] .border-\[\#1e2d4f\] {
-  border-color: #1f2937 !important;
+html[data-theme="midnight"] .bg-\[\#0c1322\],
+html[data-theme="midnight"] .bg-\[\#0c1424\],
+html[data-theme="midnight"] .bg-\[\#0c1427\],
+html[data-theme="midnight"] .bg-\[\#0c162b\],
+html[data-theme="midnight"] .bg-\[\#0e172a\] {
+  background-color: #0D1320 !important;
+}
+
+html[data-theme="midnight"] .bg-\[\#121f3d\],
+html[data-theme="midnight"] .bg-\[\#1a2540\] {
+  background-color: #172033 !important;
+}
+
+/* Border utilities in Midnight Enterprise */
+html[data-theme="midnight"] .border-\[\#1e2d4f\] {
+  border-color: #263449 !important;
+}
+
+html[data-theme="midnight"] .border-\[\#253556\] {
+  border-color: #1E293B !important;
+}
+
+html[data-theme="midnight"] .divide-\[\#1e2d4f\] > * + * {
+  border-color: #263449 !important;
+}
+
+/* Text color utilities in Midnight Enterprise */
+html[data-theme="midnight"] .text-\[\#e8edf5\] {
+  color: #F1F5F9 !important;
+}
+
+html[data-theme="midnight"] .text-\[\#8fa3bf\] {
+  color: #94A3B8 !important;
+}
+
+html[data-theme="midnight"] .text-\[\#4a6180\] {
+  color: #64748B !important;
+}
+
+/* Form controls in Midnight Enterprise */
+html[data-theme="midnight"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="midnight"] textarea,
+html[data-theme="midnight"] select {
+  background-color: #0D1320 !important;
+  color: #F1F5F9 !important;
+  border-color: #263449 !important;
+}
+
+html[data-theme="midnight"] input::placeholder,
+html[data-theme="midnight"] textarea::placeholder {
+  color: #64748B !important;
+}
+
+html[data-theme="midnight"] input:focus,
+html[data-theme="midnight"] textarea:focus,
+html[data-theme="midnight"] select:focus {
+  border-color: #06B6D4 !important;
+}
+
+/* Hover, elevated, and interactive element utilities in Midnight Enterprise */
+html[data-theme="midnight"] .hover\:bg-white\/5:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+html[data-theme="midnight"] .hover\:bg-white\/2:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+html[data-theme="midnight"] .bg-white\/6 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Recharts tooltip in Midnight Enterprise */
+html[data-theme="midnight"] .recharts-default-tooltip {
+  background-color: #111827 !important;
+  border-color: #263449 !important;
+  color: #F1F5F9 !important;
+}
+
+/* ── Peachy White Mode (html[data-theme="peachy"]) ──────────────────────────── */
+html[data-theme="peachy"] {
+  --color-bg-primary: #FFF9F5;
+  --color-bg-secondary: #FFF1E8;
+  --color-bg-card: #FFFFFF;
+  --color-bg-elevated: #FFF7F1;
+  --color-bg-input: #FFFFFF;
+  --color-border: #F0DCD2;
+  --color-border-light: #F7EAE3;
+
+  --color-cyan: #E89578;
+  --color-cyan-dim: #D78366;
+  --color-cyan-muted: rgba(232, 149, 120, 0.15);
+  --color-violet: #D98BA7;
+  --color-violet-dim: #C57492;
+  --color-violet-muted: rgba(217, 139, 167, 0.15);
+
+  --color-text-primary: #29212B;
+  --color-text-secondary: #756A73;
+  --color-text-muted: #9E929C;
+  --color-text-accent: #E89578;
+
+  --color-success: #269B78;
+  --color-success-muted: rgba(38, 155, 120, 0.15);
+  --color-warning: #D99135;
+  --color-warning-muted: rgba(217, 145, 53, 0.15);
+  --color-error: #D95365;
+  --color-error-muted: rgba(217, 83, 101, 0.15);
+  --color-info: #D98BA7;
+  --color-info-muted: rgba(217, 139, 167, 0.15);
+
+  --shadow-sm: 0 1px 3px rgba(41, 33, 43, 0.05);
+  --shadow-md: 0 4px 16px rgba(232, 149, 120, 0.08);
+  --shadow-lg: 0 10px 30px rgba(232, 149, 120, 0.12);
+  --shadow-glow-cyan: 0 0 20px rgba(232, 149, 120, 0.2);
+
+  /* Brand Logo Variables — Peachy White Warm Peach, Coral & Soft Pink */
+  --brand-emblem-aura-start: #E89578;
+  --brand-emblem-aura-mid: #D98BA7;
+  --brand-shield-stroke-1: #F7A88E;
+  --brand-shield-stroke-2: #E89578;
+  --brand-shield-stroke-3: #D98BA7;
+  --brand-shield-fill-1: #FFF7F1;
+  --brand-shield-fill-2: #FFF1E8;
+  --brand-lock-fill-1: #E89578;
+  --brand-lock-fill-2: #D98BA7;
+  --brand-inner-contour: #E89578;
+  --brand-lock-shackle: #29212B;
+  --brand-lock-stroke: #E89578;
+  --brand-keyhole: #29212B;
+  --brand-filter-shadow: drop-shadow(0 0 10px rgba(232, 149, 120, 0.35));
+  --brand-wordmark-sor: #29212B;
+  --brand-wordmark-sentinel: #E89578;
+  --brand-subtext: #756A73;
+  --brand-divider: #F0DCD2;
+  --brand-badge-text: #E89578;
+  --brand-badge-border: rgba(232, 149, 120, 0.45);
+  --brand-badge-bg: rgba(232, 149, 120, 0.12);
+}
+
+html[data-theme="peachy"] body {
+  background-color: #FFF9F5 !important;
+  color: #29212B !important;
+}
+
+/* ── 1. Page Backgrounds & Neutral Container Mappings ───────────────────────── */
+html[data-theme="peachy"] .bg-\[\#0a0f1a\],
+html[data-theme="peachy"] [class*="bg-[#0a0f1a]"],
+html[data-theme="peachy"] .bg-\[\#0a101d\],
+html[data-theme="peachy"] [class*="bg-[#0a101d]"],
+html[data-theme="peachy"] .bg-\[\#070c17\],
+html[data-theme="peachy"] [class*="bg-[#070c17]"],
+html[data-theme="peachy"] .bg-\[\#080d17\],
+html[data-theme="peachy"] [class*="bg-[#080d17]"],
+html[data-theme="peachy"] .bg-\[\#070d18\],
+html[data-theme="peachy"] [class*="bg-[#070d18]"],
+html[data-theme="peachy"] .bg-\[\#0b1220\],
+html[data-theme="peachy"] [class*="bg-[#0b1220]"] {
+  background-color: #FFF9F5 !important;
+}
+
+html[data-theme="peachy"] .bg-\[\#0f1629\],
+html[data-theme="peachy"] [class*="bg-[#0f1629]"],
+html[data-theme="peachy"] .bg-\[\#0c1322\],
+html[data-theme="peachy"] [class*="bg-[#0c1322]"],
+html[data-theme="peachy"] .bg-\[\#0e172a\],
+html[data-theme="peachy"] [class*="bg-[#0e172a]"] {
+  background-color: #FFF7F1 !important;
+}
+
+/* ── 2. Primary Cards & Elevated Content Surfaces ───────────────────────────── */
+html[data-theme="peachy"] .card,
+html[data-theme="peachy"] .bg-\[\#131d35\],
+html[data-theme="peachy"] [class*="bg-[#131d35]"],
+html[data-theme="peachy"] .bg-\[\#162340\],
+html[data-theme="peachy"] [class*="bg-[#162340]"] {
+  background-color: #FFFFFF !important;
+  border-color: #F0DCD2 !important;
+  box-shadow: 0 4px 16px rgba(232, 149, 120, 0.06);
+}
+
+html[data-theme="peachy"] .bg-\[\#121f3d\],
+html[data-theme="peachy"] [class*="bg-[#121f3d]"],
+html[data-theme="peachy"] .bg-\[\#1a2540\],
+html[data-theme="peachy"] [class*="bg-[#1a2540]"] {
+  background-color: #FFF1E8 !important;
+}
+
+/* ── 3. Borders & Separator Dividers ────────────────────────────────────────── */
+html[data-theme="peachy"] .border-\[\#1e2d4f\],
+html[data-theme="peachy"] [class*="border-[#1e2d4f]"],
+html[data-theme="peachy"] .border-\[\#162544\],
+html[data-theme="peachy"] .border-\[\#1a2942\],
+html[data-theme="peachy"] .border-\[\#243356\] {
+  border-color: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .border-\[\#253556\],
+html[data-theme="peachy"] [class*="border-[#253556]"] {
+  border-color: #F7EAE3 !important;
+}
+
+html[data-theme="peachy"] .divide-\[\#1e2d4f\] > * + *,
+html[data-theme="peachy"] [class*="divide-[#1e2d4f]"] > * + * {
+  border-color: #F0DCD2 !important;
+}
+
+/* ── 4. Text Contrast & Typography Hierarchy ────────────────────────────────── */
+html[data-theme="peachy"] .text-\[\#e8edf5\],
+html[data-theme="peachy"] [class*="text-[#e8edf5]"],
+html[data-theme="peachy"] .text-\[\#c8d6e5\],
+html[data-theme="peachy"] [class*="text-[#c8d6e5]"],
+html[data-theme="peachy"] .text-white {
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] .text-\[\#8fa3bf\],
+html[data-theme="peachy"] [class*="text-[#8fa3bf]"],
+html[data-theme="peachy"] .text-slate-400,
+html[data-theme="peachy"] .text-slate-300,
+html[data-theme="peachy"] .text-slate-200 {
+  color: #756A73 !important;
+}
+
+html[data-theme="peachy"] .text-\[\#4a6180\],
+html[data-theme="peachy"] [class*="text-[#4a6180]"],
+html[data-theme="peachy"] .text-slate-500 {
+  color: #9E929C !important;
+}
+
+html[data-theme="peachy"] .text-cyan-400,
+html[data-theme="peachy"] [class*="text-cyan-400"],
+html[data-theme="peachy"] .text-cyan-300,
+html[data-theme="peachy"] [class*="text-cyan-300"] {
+  color: #E89578 !important;
+}
+
+/* Ensure buttons with solid primary brand keep white text */
+html[data-theme="peachy"] .bg-cyan-500,
+html[data-theme="peachy"] .bg-cyan-400,
+html[data-theme="peachy"] button.bg-cyan-500,
+html[data-theme="peachy"] [class*="bg-cyan-500"] {
+  background-color: #E89578 !important;
+  color: #FFFFFF !important;
+}
+
+html[data-theme="peachy"] .bg-cyan-500\/10,
+html[data-theme="peachy"] [class*="bg-cyan-500/10"],
+html[data-theme="peachy"] .bg-cyan-500\/15,
+html[data-theme="peachy"] [class*="bg-cyan-500/15"],
+html[data-theme="peachy"] .bg-cyan-500\/20,
+html[data-theme="peachy"] [class*="bg-cyan-500/20"] {
+  background-color: rgba(232, 149, 120, 0.12) !important;
+  color: #E89578 !important;
+}
+
+/* ── 5. Sidebar Branding & Topbar Shortcuts ───────────────────────────────── */
+html[data-theme="peachy"] .sidebar-brand-container {
+  background-color: #FFF1E8 !important;
+  border-color: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .sidebar-brand-glow {
+  background-color: rgba(232, 149, 120, 0.15) !important;
+}
+
+html[data-theme="peachy"] .topbar-investigate-btn {
+  background-color: rgba(232, 149, 120, 0.12) !important;
+  border-color: rgba(232, 149, 120, 0.35) !important;
+  color: #E89578 !important;
+}
+
+html[data-theme="peachy"] .topbar-investigate-btn:hover {
+  background-color: rgba(232, 149, 120, 0.22) !important;
+  border-color: #E89578 !important;
+}
+
+html[data-theme="peachy"] .topbar-investigate-btn svg {
+  color: #E89578 !important;
+}
+
+/* ── 6. Dashboard Hero Banner (Premium Light Red / Coral Theme) ────────── */
+html[data-theme="peachy"] .dashboard-hero-banner,
+html[data-theme="peachy"] [class*="from-[#0c1427]"] {
+  background: linear-gradient(135deg, #FFF0EC 0%, #FFE6DE 45%, #FFDDD1 100%) !important;
+  background-image: linear-gradient(135deg, #FFF0EC 0%, #FFE6DE 45%, #FFDDD1 100%) !important;
+  border: 1px solid #F5C6B8 !important;
+  box-shadow: 0 12px 36px rgba(224, 102, 78, 0.12) !important;
+}
+
+html[data-theme="peachy"] .dashboard-hero-banner h1 {
+  color: #241A22 !important;
+}
+
+html[data-theme="peachy"] .dashboard-hero-banner p {
+  color: #6E5E67 !important;
+}
+
+html[data-theme="peachy"] .hero-status-pill {
+  background-color: rgba(224, 102, 78, 0.14) !important;
+  color: #D34B30 !important;
+  border-color: rgba(224, 102, 78, 0.35) !important;
+}
+
+html[data-theme="peachy"] .hero-oracle-pill,
+html[data-theme="peachy"] .dashboard-hero-banner [class*="bg-[#1e2d4f]"] {
+  background-color: #FFFFFF !important;
+  border: 1px solid #F5C6B8 !important;
+  color: #6E5E67 !important;
+}
+
+html[data-theme="peachy"] .hero-ticker {
+  border-color: #F5C6B8 !important;
+}
+
+html[data-theme="peachy"] .ticker-label {
+  color: #8C7882 !important;
+}
+
+/* ── 6A. Dashboard KPI Metric Cards (Coral Accents & Shadows) ───────────── */
+html[data-theme="peachy"] .kpi-metric-card {
+  background-color: #FFFFFF !important;
+  border: 1px solid #F2DDD3 !important;
+  box-shadow: 0 4px 18px rgba(224, 102, 78, 0.06) !important;
+  transition: all 0.25s ease !important;
+}
+
+html[data-theme="peachy"] .kpi-metric-card:hover {
+  border-color: #E87258 !important;
+  box-shadow: 0 10px 28px rgba(224, 102, 78, 0.14) !important;
+  transform: translateY(-2px);
+}
+
+html[data-theme="peachy"] .kpi-icon-coral {
+  background-color: rgba(232, 114, 88, 0.12) !important;
+  border: 1px solid rgba(232, 114, 88, 0.25) !important;
+  color: #D34B30 !important;
+}
+
+html[data-theme="peachy"] .kpi-icon-blush {
+  background-color: rgba(217, 83, 101, 0.12) !important;
+  border: 1px solid rgba(217, 83, 101, 0.25) !important;
+  color: #D95365 !important;
+}
+
+/* ── 6B. Dashboard Chart Cards, Tabs & Tooltips ───────────────────────────── */
+html[data-theme="peachy"] .dashboard-chart-card {
+  background-color: #FFFFFF !important;
+  border: 1px solid #F2DDD3 !important;
+  box-shadow: 0 4px 20px rgba(224, 102, 78, 0.06) !important;
+}
+
+html[data-theme="peachy"] .chart-tab-group {
+  background-color: #FFF5F0 !important;
+  border: 1px solid #F2DDD3 !important;
+}
+
+html[data-theme="peachy"] .chart-tab-active {
+  background-color: #E87258 !important;
+  color: #FFFFFF !important;
+  border-color: #E87258 !important;
+  box-shadow: 0 2px 8px rgba(232, 114, 88, 0.25) !important;
+}
+
+html[data-theme="peachy"] .chart-tab-inactive {
+  color: #756A73 !important;
+}
+
+/* ── 6C. Statistical Threat Distribution Doughnut Chart & Legend ──────────── */
+html[data-theme="peachy"] .pie-stat-legend-item {
+  background-color: #FFF9F6 !important;
+  border: 1px solid #F2DDD3 !important;
+}
+
+html[data-theme="peachy"] .pie-stat-legend-item:hover {
+  background-color: #FFF0EC !important;
+  border-color: #E87258 !important;
+  box-shadow: 0 4px 14px rgba(224, 102, 78, 0.1) !important;
+}
+
+html[data-theme="peachy"] .pie-stat-legend-name {
+  color: #241A22 !important;
+}
+
+html[data-theme="peachy"] .pie-center-value {
+  color: #241A22 !important;
+}
+
+html[data-theme="peachy"] .pie-center-label {
+  color: #8C7882 !important;
+}
+
+html[data-theme="peachy"] .pie-tooltip-box {
+  background-color: #FFFFFF !important;
+  border: 1px solid #F2DDD3 !important;
+  box-shadow: 0 10px 30px rgba(41, 33, 43, 0.12) !important;
+}
+
+html[data-theme="peachy"] .pie-tooltip-box span {
+  color: #241A22 !important;
+}
+
+html[data-theme="peachy"] .dashboard-recent-table th {
+  color: #756A73 !important;
+  border-color: #F2DDD3 !important;
+}
+
+html[data-theme="peachy"] .dashboard-recent-table td {
+  border-color: #F2DDD3 !important;
+  color: #241A22 !important;
+}
+
+html[data-theme="peachy"] .dashboard-recent-table tr:hover {
+  background-color: #FFF5F0 !important;
+}
+
+/* ── 7. Investigation History Table (Screenshot 2 Fix) ──────────────────────── */
+html[data-theme="peachy"] .analysis-table-container,
+html[data-theme="peachy"] .analysis-table-container table,
+html[data-theme="peachy"] .analysis-table-container tbody {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-color: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] table thead,
+html[data-theme="peachy"] table thead tr {
+  background-color: #FFF1E8 !important;
+  background: #FFF1E8 !important;
+  border-color: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] table thead th {
+  color: #756A73 !important;
+  border-bottom: 1px solid #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .analysis-table-container tr,
+html[data-theme="peachy"] table tbody tr,
+html[data-theme="peachy"] .analysis-table-row {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-color: #F0DCD2 !important;
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] .analysis-table-container tr:nth-child(even),
+html[data-theme="peachy"] table tbody tr:nth-child(even),
+html[data-theme="peachy"] .analysis-table-row:nth-child(even) {
+  background-color: #FFF9F5 !important;
+  background: #FFF9F5 !important;
+}
+
+html[data-theme="peachy"] .analysis-table-container tr:hover,
+html[data-theme="peachy"] table tbody tr:hover,
+html[data-theme="peachy"] .analysis-table-row:hover {
+  background-color: #FFF1E8 !important;
+  background: #FFF1E8 !important;
+}
+
+html[data-theme="peachy"] .analysis-table-container td,
+html[data-theme="peachy"] table td {
+  border-bottom: 1px solid #F0DCD2 !important;
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] .analysis-table-container td span.text-\[\#e8edf5\],
+html[data-theme="peachy"] .analysis-table-container td p.text-\[\#8fa3bf\],
+html[data-theme="peachy"] .analysis-table-container td span.font-numeric {
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] .pagination-bar {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-color: #F0DCD2 !important;
+  color: #756A73 !important;
+}
+
+html[data-theme="peachy"] .pagination-bar strong,
+html[data-theme="peachy"] .pagination-bar span.font-numeric {
+  color: #29212B !important;
+}
+
+/* ── 8. Investigation Details (Screenshot 4 Fix) ────────────────────────────── */
+html[data-theme="peachy"] .dossier-header-banner,
+html[data-theme="peachy"] [class*="from-[#0c162b]"] {
+  background: linear-gradient(135deg, #FFF1E8 0%, #FFF7F1 100%) !important;
+  background-image: linear-gradient(135deg, #FFF1E8 0%, #FFF7F1 100%) !important;
+  border-color: #F0DCD2 !important;
+  box-shadow: 0 6px 20px rgba(232, 149, 120, 0.08) !important;
+}
+
+html[data-theme="peachy"] .dossier-header-banner span,
+html[data-theme="peachy"] .dossier-header-banner p {
+  color: #756A73 !important;
+}
+
+html[data-theme="peachy"] .dossier-header-banner span.font-bold {
+  color: #E89578 !important;
+}
+
+html[data-theme="peachy"] .dossier-scan-pill,
+html[data-theme="peachy"] .dossier-header-banner [class*="bg-[#1e2d4f]"] {
+  background-color: #FFFFFF !important;
+  border: 1px solid #F0DCD2 !important;
+  color: #756A73 !important;
+}
+
+html[data-theme="peachy"] .dossier-copy-btn {
+  background-color: #FFFFFF !important;
+  border-color: #F0DCD2 !important;
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] .dossier-copy-btn:hover {
+  background-color: #FFF1E8 !important;
+}
+
+html[data-theme="peachy"] .finding-category-pill {
+  background-color: #FFF1E8 !important;
+  border: 1px solid #F0DCD2 !important;
+  color: #756A73 !important;
+}
+
+html[data-theme="peachy"] .finding-evidence-box {
+  background-color: #FFF9F5 !important;
+  border-color: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .finding-evidence-box p {
+  color: #29212B !important;
+  border-left-color: #E89578 !important;
+}
+
+/* ── 9. Cubbis Cyber AI (Screenshot 1 Fix) ──────────────────────────────────── */
+html[data-theme="peachy"] .cubbis-chat-header {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-color: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .cubbis-chat-header h2 {
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] .cubbis-chat-header p {
+  color: #756A73 !important;
+}
+
+html[data-theme="peachy"] .cubbis-chat-header .bg-\[\#131d35\] {
+  background-color: #FFF1E8 !important;
+  border-color: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .cubbis-sidebar {
+  background-color: #FFF7F1 !important;
+  border-color: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .cubbis-newchat-btn {
+  background-color: #E89578 !important;
+  color: #FFFFFF !important;
+}
+
+html[data-theme="peachy"] .cubbis-newchat-btn:hover {
+  background-color: #D78366 !important;
+}
+
+html[data-theme="peachy"] .cubbis-query-card {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-color: #F0DCD2 !important;
+  box-shadow: 0 4px 14px rgba(232, 149, 120, 0.08) !important;
+}
+
+html[data-theme="peachy"] .cubbis-query-card:hover {
+  background-color: #FFF7F1 !important;
+  background: #FFF7F1 !important;
+  border-color: #E89578 !important;
+  box-shadow: 0 6px 18px rgba(232, 149, 120, 0.15) !important;
+}
+
+html[data-theme="peachy"] .cubbis-query-card h4 {
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] .cubbis-query-card p {
+  color: #756A73 !important;
+}
+
+html[data-theme="peachy"] .query-icon-box {
+  background-color: #FFF1E8 !important;
+  background: #FFF1E8 !important;
+  border-color: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .cubbis-dock-wrapper {
+  background: linear-gradient(to top, #FFF9F5 0%, rgba(255, 249, 245, 0.95) 80%, transparent 100%) !important;
+  background-image: linear-gradient(to top, #FFF9F5 0%, rgba(255, 249, 245, 0.95) 80%, transparent 100%) !important;
+}
+
+html[data-theme="peachy"] .cubbis-dock-card {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-color: #F0DCD2 !important;
+  box-shadow: 0 8px 24px rgba(232, 149, 120, 0.1) !important;
+}
+
+html[data-theme="peachy"] .cubbis-dock-card textarea,
+html[data-theme="peachy"] textarea.bg-transparent {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] .cubbis-dock-card textarea::placeholder,
+html[data-theme="peachy"] textarea.bg-transparent::placeholder {
+  color: #9E929C !important;
+}
+
+html[data-theme="peachy"] .cubbis-assistant-msg {
+  background-color: #FFFFFF !important;
+  border-color: #F0DCD2 !important;
+  color: #29212B !important;
+  box-shadow: 0 2px 10px rgba(232, 149, 120, 0.06) !important;
+}
+
+html[data-theme="peachy"] .cubbis-assistant-msg p,
+html[data-theme="peachy"] .cubbis-assistant-msg li,
+html[data-theme="peachy"] .cubbis-assistant-msg td {
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] .cubbis-user-msg {
+  background-color: rgba(232, 149, 120, 0.15) !important;
+  border-color: rgba(232, 149, 120, 0.35) !important;
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] .cubbis-code-block {
+  border-color: #F0DCD2 !important;
+  background-color: #FFF9F5 !important;
+}
+
+html[data-theme="peachy"] .cubbis-code-header {
+  background-color: #FFF1E8 !important;
+  border-color: #F0DCD2 !important;
+  color: #756A73 !important;
+}
+
+html[data-theme="peachy"] .cubbis-code-block pre code {
+  color: #29212B !important;
+}
+
+/* ── 10. DigiKeeper Document Vault Styling & Modals ─────────────────────────── */
+/* Shared Enclave Primary Page Title Typography (Matches Security Operations Center exactly) */
+.dashboard-hero-title,
+.digikeeper-heading {
+  font-family: 'Space Grotesk', -apple-system, sans-serif !important;
+  font-size: 1.5rem !important; /* 24px */
+  line-height: 2rem !important; /* 32px */
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+}
+
+@media (min-width: 640px) {
+  .dashboard-hero-title,
+  .digikeeper-heading {
+    font-size: 1.875rem !important; /* 30px */
+    line-height: 2.25rem !important; /* 36px */
+  }
+}
+
+html[data-theme="peachy"] .digikeeper-header-icon {
+  background-color: rgba(224, 102, 78, 0.12) !important;
+  border-color: rgba(224, 102, 78, 0.3) !important;
+  color: #D34B30 !important;
+}
+
+html[data-theme="peachy"] .digikeeper-heading {
+  color: #241A22 !important;
+}
+
+html[data-theme="peachy"] .digikeeper-cipher-badge {
+  background-color: rgba(224, 102, 78, 0.12) !important;
+  border-color: rgba(224, 102, 78, 0.35) !important;
+  color: #D34B30 !important;
+}
+
+html[data-theme="peachy"] .digikeeper-desc {
+  color: #6E5E67 !important;
+}
+
+/* Modals & Backdrop Overlays */
+html[data-theme="peachy"] .modal-backdrop,
+html[data-theme="peachy"] [class*="bg-black/"] {
+  background-color: rgba(41, 33, 43, 0.45) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+html[data-theme="peachy"] .modal-surface {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-color: #F0DCD2 !important;
+  box-shadow: 0 16px 40px rgba(41, 33, 43, 0.15) !important;
+}
+
+html[data-theme="peachy"] .modal-header {
+  background-color: #FFF1E8 !important;
+  background: #FFF1E8 !important;
+  border-bottom: 1px solid #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .modal-header h3,
+html[data-theme="peachy"] .modal-header h4 {
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] .modal-header p,
+html[data-theme="peachy"] .modal-header span {
+  color: #756A73 !important;
+}
+
+html[data-theme="peachy"] .dropzone-box {
+  background-color: #FFF9F5 !important;
+  border-color: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .dropzone-box:hover {
+  background-color: #FFF1E8 !important;
+  border-color: #E89578 !important;
+}
+
+/* ── 11. Form Inputs, Selects, and Textareas ─────────────────────────────────── */
+html[data-theme="peachy"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="peachy"] textarea:not(.bg-transparent),
+html[data-theme="peachy"] select {
+  background-color: #FFFFFF !important;
+  color: #29212B !important;
+  border-color: #F0DCD2 !important;
+  box-shadow: 0 1px 3px rgba(41, 33, 43, 0.04);
+}
+
+html[data-theme="peachy"] .cubbis-dock-card textarea,
+html[data-theme="peachy"] textarea.bg-transparent {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: #29212B !important;
+}
+
+html[data-theme="peachy"] input::placeholder,
+html[data-theme="peachy"] textarea::placeholder {
+  color: #9E929C !important;
+}
+
+html[data-theme="peachy"] input:focus,
+html[data-theme="peachy"] textarea:not(.bg-transparent):focus,
+html[data-theme="peachy"] select:focus {
+  border-color: #E89578 !important;
+  box-shadow: 0 0 0 3px rgba(232, 149, 120, 0.2) !important;
+}
+
+/* ── 10. Interactive Buttons & Hover States ─────────────────────────────────── */
+html[data-theme="peachy"] .hover\:bg-white\/5:hover,
+html[data-theme="peachy"] .hover\:bg-white\/10:hover {
+  background-color: rgba(232, 149, 120, 0.1) !important;
+}
+
+html[data-theme="peachy"] .bg-white\/5,
+html[data-theme="peachy"] .bg-white\/6,
+html[data-theme="peachy"] .bg-white\/10 {
+  background-color: rgba(232, 149, 120, 0.08) !important;
+  color: #756A73 !important;
+}
+
+/* ── 11. Recharts Tooltips, Axes, and Grid Lines ────────────────────────────── */
+html[data-theme="peachy"] .recharts-default-tooltip {
+  background-color: #FFFFFF !important;
+  border: 1px solid #F0DCD2 !important;
+  color: #29212B !important;
+  box-shadow: 0 8px 24px rgba(41, 33, 43, 0.1) !important;
+}
+
+html[data-theme="peachy"] .recharts-cartesian-grid line {
+  stroke: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .recharts-cartesian-axis line {
+  stroke: #F0DCD2 !important;
+}
+
+html[data-theme="peachy"] .recharts-cartesian-axis-tick text {
+  fill: #756A73 !important;
 }
 
 /* ── Print & Export Optimization ─────────────────────────────────────────── */

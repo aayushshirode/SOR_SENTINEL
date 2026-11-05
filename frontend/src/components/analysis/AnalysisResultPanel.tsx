@@ -32,7 +32,7 @@ function CredibilityGauge({ score }: { score: number }) {
       <div className="relative w-32 h-32 flex items-center justify-center">
         <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
           {/* Background Track */}
-          <circle cx="50" cy="50" r={r} fill="none" stroke="#1e2d4f" strokeWidth="8" />
+          <circle cx="50" cy="50" r={r} fill="none" stroke="var(--color-border, #1e2d4f)" strokeWidth="8" />
           {/* Animated Progress Ring */}
           <circle
             cx="50"
@@ -53,14 +53,14 @@ function CredibilityGauge({ score }: { score: number }) {
           <span className={`text-3xl font-extrabold font-space leading-none ${colorClass}`}>
             {pct}
           </span>
-          <span className="text-[10px] font-rajdhani font-bold uppercase tracking-wider text-[#8fa3bf] mt-1">
+          <span className="text-[10px] font-rajdhani font-semibold text-[#8fa3bf] mt-1">
             Score / 100
           </span>
         </div>
       </div>
 
       <div className="text-center mt-2">
-        <span className={`text-xs font-bold font-rajdhani uppercase tracking-wider ${colorClass}`}>
+        <span className={`text-xs font-bold font-rajdhani ${colorClass}`}>
           {label}
         </span>
       </div>
@@ -69,20 +69,20 @@ function CredibilityGauge({ score }: { score: number }) {
 }
 
 function SensitivityBadge({ level }: { level?: string }) {
-  const map: Record<string, { color: string; bg: string; border: string; desc: string }> = {
-    LOW:      { color: 'text-emerald-400', bg: 'bg-emerald-500/15', border: 'border-emerald-500/30', desc: 'No sensitive data detected' },
-    MEDIUM:   { color: 'text-yellow-400',  bg: 'bg-yellow-500/15',  border: 'border-yellow-500/30',  desc: 'Potential contextual exposure' },
-    HIGH:     { color: 'text-orange-400',  bg: 'bg-orange-500/15',  border: 'border-orange-500/30',  desc: 'PII or confidential disclosures' },
-    CRITICAL: { color: 'text-red-400',     bg: 'bg-red-500/15',     border: 'border-red-500/30',     desc: 'Severe security or credential leak' },
+  const map: Record<string, { color: string; bg: string; border: string; desc: string; label: string }> = {
+    LOW:      { color: 'text-emerald-400', bg: 'bg-emerald-500/15', border: 'border-emerald-500/30', desc: 'No sensitive data detected', label: 'Low Sensitivity' },
+    MEDIUM:   { color: 'text-yellow-400',  bg: 'bg-yellow-500/15',  border: 'border-yellow-500/30',  desc: 'Potential contextual exposure', label: 'Medium Sensitivity' },
+    HIGH:     { color: 'text-orange-400',  bg: 'bg-orange-500/15',  border: 'border-orange-500/30',  desc: 'PII or confidential disclosures', label: 'High Sensitivity' },
+    CRITICAL: { color: 'text-red-400',     bg: 'bg-red-500/15',     border: 'border-red-500/30',     desc: 'Severe security or credential leak', label: 'Critical Sensitivity' },
   };
   const key = (level || 'LOW').toUpperCase();
   const s = map[key] ?? map['LOW'];
 
   return (
     <div className="flex flex-col items-center gap-1.5">
-      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-rajdhani font-bold tracking-wider uppercase border ${s.bg} ${s.border} ${s.color}`}>
+      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-rajdhani font-bold border ${s.bg} ${s.border} ${s.color}`}>
         <Shield className="w-3.5 h-3.5" />
-        {key} SENSITIVITY
+        {s.label}
       </span>
       <span className="text-[11px] font-plex text-[#8fa3bf] text-center max-w-[160px]">
         {s.desc}
@@ -103,9 +103,9 @@ function AssessmentBadge({ assessment }: { assessment?: string }) {
     : 'text-red-400 bg-red-500/15 border-red-500/30';
 
   return (
-    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-xl text-sm font-bold font-rajdhani uppercase tracking-wider border shadow-sm ${color}`}>
+    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-xl text-sm font-bold font-rajdhani border shadow-sm ${color}`}>
       <span className="w-2 h-2 rounded-full bg-current animate-pulse" />
-      {assessment || 'REQUIRES VERIFICATION'}
+      {assessment || 'Requires Verification'}
     </span>
   );
 }
@@ -164,7 +164,7 @@ ${analysis.summary || 'No summary provided.'}`;
   return (
     <div className="space-y-6 animate-fade-in">
       {/* ── 1. Threat Dossier Header Banner ─────────────────────────────────── */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#0c162b] to-[#121f3d] border border-[#1e2d4f] shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="dossier-header-banner p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#0c162b] to-[#121f3d] border border-[#1e2d4f] shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/25 text-cyan-400">
             {analysis.analysis_type === 'url' ? <Globe className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
@@ -174,7 +174,7 @@ ${analysis.summary || 'No summary provided.'}`;
               <span className="text-xs font-rajdhani font-bold text-cyan-400 tracking-wider uppercase">
                 SENTINEL-TR-{String(analysis.id).padStart(6, '0')}
               </span>
-              <span className="text-[10px] font-rajdhani font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#1e2d4f] text-[#8fa3bf]">
+              <span className="dossier-scan-pill text-[10px] font-rajdhani font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#1e2d4f] text-[#8fa3bf]">
                 {analysis.analysis_type.toUpperCase()} SCAN
               </span>
               <span className="text-[10px] font-rajdhani font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -199,7 +199,7 @@ ${analysis.summary || 'No summary provided.'}`;
           <button
             type="button"
             onClick={handleCopySummary}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-outfit font-medium text-[#8fa3bf] hover:text-[#e8edf5] bg-[#0f1629] hover:bg-white/5 border border-[#1e2d4f] transition-all"
+            className="dossier-copy-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-outfit font-medium text-[#8fa3bf] hover:text-[#e8edf5] bg-[#0f1629] hover:bg-white/5 border border-[#1e2d4f] transition-all"
             title="Copy structured summary"
           >
             {copiedSummary ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -213,7 +213,7 @@ ${analysis.summary || 'No summary provided.'}`;
         {/* Overall Assessment & Summary */}
         <div className="md:col-span-2 p-6 rounded-2xl bg-[#131d35] border border-[#1e2d4f] shadow-xl flex flex-col justify-between space-y-4">
           <div>
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4a6180] block mb-2">
+            <span className="text-[11px] font-mono font-semibold text-[#4a6180] block mb-2">
               Primary Threat Assessment Verdict
             </span>
             <AssessmentBadge assessment={analysis.overall_assessment} />
@@ -264,7 +264,7 @@ ${analysis.summary || 'No summary provided.'}`;
         <div className="p-6 rounded-2xl bg-[#131d35] border border-[#1e2d4f] shadow-xl flex flex-col items-center justify-center gap-6">
           <CredibilityGauge score={analysis.credibility_score ?? 0} />
           <div className="w-full pt-4 border-t border-[#1e2d4f] flex flex-col items-center">
-            <span className="text-[10px] font-mono font-bold text-[#4a6180] uppercase tracking-wider mb-1.5">
+            <span className="text-[10px] font-mono font-semibold text-[#4a6180] mb-1.5">
               Data Sensitivity Rating
             </span>
             <SensitivityBadge level={analysis.sensitivity_level} />
@@ -295,8 +295,8 @@ ${analysis.summary || 'No summary provided.'}`;
                 </div>
               </div>
 
-              <span className={`px-2.5 py-1 rounded-full text-xs font-mono font-bold border ${cfg.bg} ${cfg.border} ${cfg.color}`}>
-                {items.length} DETECTED
+              <span className={`px-2.5 py-1 rounded-full text-xs font-mono font-medium border ${cfg.bg} ${cfg.border} ${cfg.color}`}>
+                {items.length} Detected
               </span>
             </div>
 
@@ -318,7 +318,7 @@ ${analysis.summary || 'No summary provided.'}`;
                             {finding.title}
                           </h4>
                           {finding.category && (
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1e2d4f] text-[#8fa3bf]">
+                            <span className="finding-category-pill text-[10px] font-mono px-2 py-0.5 rounded bg-[#1e2d4f] text-[#8fa3bf]">
                               {finding.category}
                             </span>
                           )}
@@ -338,7 +338,7 @@ ${analysis.summary || 'No summary provided.'}`;
 
                     {/* Extracted Evidence Quote Box */}
                     {finding.evidence && (
-                      <div className="mt-2.5 p-3 rounded-lg bg-[#080d17] border border-[#1e2d4f] text-xs">
+                      <div className="finding-evidence-box mt-2.5 p-3 rounded-lg bg-[#080d17] border border-[#1e2d4f] text-xs">
                         <div className="flex items-center gap-1.5 text-cyan-400 font-mono text-[10px] uppercase font-bold mb-1">
                           <Terminal className="w-3 h-3" />
                           Detected Content Evidence:

@@ -64,17 +64,40 @@ def update_user_email(db: Session, user_id: int, new_email: str) -> Optional[Use
     return user
 
 
-def create_user(db: Session, user_data: UserCreate) -> User:
+def create_user(db: Session, user_data: UserCreate, is_verified: bool = False) -> User:
     user = User(
         full_name=user_data.full_name.strip(),
         email=user_data.email.lower().strip(),
         password_hash=hash_password(user_data.password),
         role="user",
         is_active=True,
+        is_verified=is_verified,
     )
     db.add(user)
     db.commit()
     db.refresh(user)
+    return user
+
+
+def update_unverified_user(db: Session, user_id: int, user_data: UserCreate) -> User:
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise ValueError("User not found.")
+    user.full_name = user_data.full_name.strip()
+    user.password_hash = hash_password(user_data.password)
+    user.updated_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def mark_user_verified(db: Session, user_id: int) -> Optional[User]:
+    user = get_user_by_id(db, user_id)
+    if user:
+        user.is_verified = True
+        user.updated_at = datetime.now(timezone.utc)
+        db.commit()
+        db.refresh(user)
     return user
 
 

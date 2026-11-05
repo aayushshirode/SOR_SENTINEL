@@ -157,6 +157,5 @@ export function Skeleton({ className }: { className?: string }) {
 }
 
 export { BrandLogo } from './BrandLogo';
-export { FloatingThemeToggle } from './FloatingThemeToggle';
 export { ThemeSwitcher } from './ThemeSwitcher';
 

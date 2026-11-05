@@ -5,6 +5,7 @@ from app.models.contact import ContactMessage
 from app.models.audit_log import AuditLog
 from app.models.digikeeper import DigiKeeperDocument
 from app.models.cubbis import CubbisConversation, CubbisMessage
+from app.models.otp import OTPVerification
 
 __all__ = [
     "User",
@@ -16,4 +17,5 @@ __all__ = [
     "DigiKeeperDocument",
     "CubbisConversation",
     "CubbisMessage",
+    "OTPVerification",
 ]

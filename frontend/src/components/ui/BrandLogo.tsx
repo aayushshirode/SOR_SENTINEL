@@ -20,81 +20,83 @@ export function ShieldLockEmblem({ className = 'w-9 h-9' }: { className?: string
         viewBox="0 0 100 100"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.45)]"
+        className="w-full h-full brand-emblem-svg"
+        style={{ filter: 'var(--brand-filter-shadow, drop-shadow(0 0 12px rgba(0,212,255,0.55)))' }}
       >
         <defs>
-          {/* Subtle outer neon ring glow */}
+          {/* Circular ambient neon glow halo */}
           <radialGradient id="sl_aura" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#00d4ff" stopOpacity="0.25" />
-            <stop offset="65%" stopColor="#00d4ff" stopOpacity="0.08" />
-            <stop offset="100%" stopColor="#00d4ff" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--brand-emblem-aura-start, #00d4ff)" stopOpacity="0.35" />
+            <stop offset="50%" stopColor="var(--brand-emblem-aura-mid, #0284c7)" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="var(--brand-emblem-aura-mid, #0284c7)" stopOpacity="0" />
           </radialGradient>
-          {/* Shield gradient outline */}
-          <linearGradient id="sl_shield_stroke" x1="20" y1="12" x2="80" y2="88" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#38bdf8" />
-            <stop offset="40%" stopColor="#00d4ff" />
-            <stop offset="100%" stopColor="#0284c7" />
+
+          {/* Shield glowing neon outline */}
+          <linearGradient id="sl_shield_stroke" x1="50" y1="14" x2="50" y2="86" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="var(--brand-shield-stroke-1, #7dd3fc)" />
+            <stop offset="35%" stopColor="var(--brand-shield-stroke-2, #00d4ff)" />
+            <stop offset="100%" stopColor="var(--brand-shield-stroke-3, #0284c7)" />
           </linearGradient>
-          {/* Shield inner fill gradient */}
-          <linearGradient id="sl_shield_fill" x1="50" y1="10" x2="50" y2="88" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#0a192f" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#050b14" stopOpacity="0.95" />
+
+          {/* Shield dark midnight interior fill */}
+          <linearGradient id="sl_shield_fill" x1="50" y1="14" x2="50" y2="86" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="var(--brand-shield-fill-1, #0a1529)" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="var(--brand-shield-fill-2, #040914)" stopOpacity="0.98" />
           </linearGradient>
-          {/* Lock fill gradient */}
-          <linearGradient id="sl_lock_fill" x1="50" y1="42" x2="50" y2="76" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#38bdf8" />
-            <stop offset="100%" stopColor="#0ea5e9" />
+
+          {/* Padlock bright cyan fill */}
+          <linearGradient id="sl_lock_fill" x1="50" y1="44" x2="50" y2="72" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="var(--brand-lock-fill-1, #67e8f9)" />
+            <stop offset="100%" stopColor="var(--brand-lock-fill-2, #38bdf8)" />
           </linearGradient>
         </defs>
 
-        {/* Outer ambient glow circles matching reference design */}
-        <circle cx="50" cy="50" r="46" fill="url(#sl_aura)" />
-        <circle cx="50" cy="50" r="44" stroke="#00d4ff" strokeOpacity="0.2" strokeWidth="1" strokeDasharray="2 3" />
-        <circle cx="50" cy="50" r="39" stroke="#00d4ff" strokeOpacity="0.12" strokeWidth="0.8" />
+        {/* Ambient neon bloom halo */}
+        <circle cx="50" cy="50" r="48" fill="url(#sl_aura)" />
 
-        {/* Outer Shield Shell */}
+        {/* Shield Outer Shell with sleek neon outline */}
         <path
-          d="M50 14C33 19 23 20.5 23 37C23 57 38 72 50 82C62 72 77 57 77 37C77 20.5 67 19 50 14Z"
+          d="M50 16C37 21.5 22 21.5 20 24C18 46 32 68 50 85C68 68 82 46 80 24C78 21.5 63 21.5 50 16Z"
           fill="url(#sl_shield_fill)"
           stroke="url(#sl_shield_stroke)"
-          strokeWidth="3.5"
+          strokeWidth="3.2"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
 
-        {/* Inner Shield Accent Contour */}
+        {/* Inner subtle shield contour accent */}
         <path
-          d="M50 20C37.5 24.2 29 25.5 29 38.5C29 53.5 40.5 65.5 50 73.5C59.5 65.5 71 53.5 71 38.5C71 25.5 62.5 24.2 50 20Z"
-          stroke="#00d4ff"
-          strokeOpacity="0.28"
-          strokeWidth="1.2"
+          d="M50 21C39 25.5 27 25.5 25.5 27.5C24 45 35 63 50 78C65 63 76 45 74.5 27.5C73 25.5 61 25.5 50 21Z"
+          stroke="var(--brand-inner-contour, #00d4ff)"
+          strokeOpacity="0.25"
+          strokeWidth="1"
         />
 
         {/* Padlock Shackle */}
         <path
-          d="M41 47V39C41 34.0294 45.0294 30 50 30C54.9706 30 59 34.0294 59 39V47"
-          stroke="#e0f2fe"
+          d="M40 46V37C40 31.4772 44.4772 27 50 27C55.5228 27 60 31.4772 60 37V46"
+          stroke="var(--brand-lock-shackle, #e0f2fe)"
           strokeWidth="3.6"
           strokeLinecap="round"
         />
 
-        {/* Padlock Body */}
+        {/* Padlock Solid Body */}
         <rect
-          x="36"
-          y="45"
-          width="28"
-          height="23"
+          x="34"
+          y="44"
+          width="32"
+          height="25"
           rx="5"
           fill="url(#sl_lock_fill)"
-          stroke="#bae6fd"
-          strokeWidth="1.8"
+          stroke="var(--brand-lock-stroke, #bae6fd)"
+          strokeWidth="1.2"
         />
 
-        {/* Padlock Keyhole */}
-        <circle cx="50" cy="53.5" r="2.6" fill="#061220" />
+        {/* Keyhole */}
+        <circle cx="50" cy="53" r="2.6" fill="var(--brand-keyhole, #040914)" />
         <path
-          d="M48.7 54.5L47.5 61.5H52.5L51.3 54.5H48.7Z"
-          fill="#061220"
+          d="M48.8 54.2L47.6 62.2H52.4L51.2 54.2H48.8Z"
+          fill="var(--brand-keyhole, #040914)"
         />
       </svg>
     </div>
@@ -125,49 +127,76 @@ export function BrandLogo({
   };
 
   const subtextSizes = {
-    sm: 'text-[8px] tracking-[0.14em]',
-    md: 'text-[9px] tracking-[0.16em]',
-    lg: 'text-[10px] tracking-[0.18em]',
-    xl: 'text-xs tracking-[0.2em]',
+    sm: 'text-[8px] tracking-[0.16em]',
+    md: 'text-[9px] tracking-[0.18em]',
+    lg: 'text-[10px] tracking-[0.2em]',
+    xl: 'text-xs tracking-[0.22em]',
   };
 
   const content = (
-    <div className={clsx('flex items-center gap-2.5 select-none group', className)}>
-      {/* Approved Shield-and-Lock Emblem */}
-      <ShieldLockEmblem className={iconSizes[size]} />
+    <div className={clsx('flex items-center justify-between w-full select-none group', className)}>
+      {/* Left Brand Identity Cluster: Emblem + Divider + Wordmark */}
+      <div className="flex items-center gap-2.5 min-w-0">
+        {/* Approved Shield-and-Lock Emblem */}
+        <ShieldLockEmblem className={iconSizes[size]} />
 
-      {/* Optional Vertical Divider */}
-      {showDivider && showWordmark && (
-        <div className="h-7 w-[1px] bg-[#1e2d4f] shrink-0" />
-      )}
+        {/* Vertical Hairline Divider */}
+        {showDivider && showWordmark && (
+          <div
+            className="h-6 w-[1px] shrink-0 mx-0.5"
+            style={{ backgroundColor: 'var(--brand-divider, #253556)' }}
+          />
+        )}
 
-      {showWordmark && (
-        <div className="flex flex-col leading-tight min-w-0">
-          <div className="flex items-center tracking-wider font-sora">
-            <span className={clsx('font-extrabold text-[#ffffff]', textSizes[size])}>
-              SOR
-            </span>
-            <span className={clsx('font-extrabold text-cyan-400 ml-1', textSizes[size])}>
-              SENTINEL
-            </span>
+        {showWordmark && (
+          <div className="flex flex-col justify-center leading-none min-w-0">
+            <div className="flex items-center font-sora leading-snug">
+              <span
+                className={clsx('font-bold tracking-wide', textSizes[size])}
+                style={{ color: 'var(--brand-wordmark-sor, #ffffff)' }}
+              >
+                SOR
+              </span>
+              <span
+                className={clsx('font-bold ml-1 tracking-wide', textSizes[size])}
+                style={{ color: 'var(--brand-wordmark-sentinel, #22d3ee)' }}
+              >
+                SENTINEL
+              </span>
+            </div>
+            {subtext ? (
+              <span
+                className={clsx('font-rajdhani font-semibold uppercase mt-0.5', subtextSizes[size])}
+                style={{ color: 'var(--brand-wordmark-sentinel, #22d3ee)' }}
+              >
+                {subtext}
+              </span>
+            ) : (
+              <span
+                className={clsx('font-rajdhani font-bold uppercase mt-0.5', subtextSizes[size])}
+                style={{ color: 'var(--brand-subtext, #8fa3bf)' }}
+              >
+                SECURITY INTELLIGENCE
+              </span>
+            )}
           </div>
-          {subtext ? (
-            <span className={clsx('font-rajdhani font-semibold tracking-[0.14em] uppercase text-cyan-400/80', subtextSizes[size])}>
-              {subtext}
-            </span>
-          ) : (
-            <span className={clsx('font-rajdhani font-semibold tracking-[0.16em] uppercase text-[#8fa3bf]', subtextSizes[size])}>
-              SECURITY INTELLIGENCE
-            </span>
-          )}
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Optional Version Badge */}
+      {/* Version Badge matching reference: clean rounded pill, theme-adaptive */}
       {badge && (
-        <span className="ml-auto shrink-0 px-2 py-0.5 rounded text-[10px] font-outfit font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+        <div
+          className="shrink-0 px-2 py-0.5 rounded-lg text-[11px] font-mono font-medium shadow-sm ml-2"
+          style={{
+            color: 'var(--brand-badge-text, #22d3ee)',
+            borderColor: 'var(--brand-badge-border, rgba(34, 211, 238, 0.5))',
+            backgroundColor: 'var(--brand-badge-bg, rgba(6, 182, 212, 0.1))',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+          }}
+        >
           {badge}
-        </span>
+        </div>
       )}
     </div>
   );

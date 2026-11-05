@@ -125,8 +125,9 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
+_configured_origins = [o.strip() for o in settings.FRONTEND_ORIGIN.split(",") if o.strip()]
 _cors_origins = list({
-    settings.FRONTEND_ORIGIN,
+    *_configured_origins,
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:5174",
@@ -135,6 +136,7 @@ _cors_origins = list({
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
+    allow_origin_regex=r"^https:\/\/.*\.netlify\.app$",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "Accept"],

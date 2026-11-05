@@ -6,6 +6,7 @@ export interface User {
   email: string;
   role: 'user' | 'admin';
   is_active: boolean;
+  is_verified?: boolean;
   avatar_url?: string;
   created_at: string;
   last_login_at?: string;
@@ -17,6 +18,17 @@ export interface TokenResponse {
   refresh_token: string;
   token_type: string;
   user: User;
+}
+
+export interface SignupInitiateResponse {
+  requires_verification: boolean;
+  email: string;
+  message: string;
+}
+
+export interface VerifyResetOtpResponse {
+  reset_token: string;
+  message: string;
 }
 
 export interface AnalysisFinding {

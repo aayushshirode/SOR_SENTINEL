@@ -27,6 +27,10 @@ export default {
         // Cybersecurity Badges, Risk Indicators, Status Tags & Section Labels (Rajdhani)
         cyber: ['"Rajdhani"', 'sans-serif'],
         rajdhani: ['"Rajdhani"', 'sans-serif'],
+
+        // Numeric Values, Statistics, Counters, Dates & Percentages (Times New Roman)
+        numeric: ['"Times New Roman"', 'Times', 'serif'],
+        times: ['"Times New Roman"', 'Times', 'serif'],
       },
     },
   },

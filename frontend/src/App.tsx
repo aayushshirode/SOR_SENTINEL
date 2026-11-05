@@ -1,6 +1,6 @@
 // SOR SENTINEL — App.tsx (Root Router)
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Public Pages
@@ -42,23 +42,27 @@ import { LoadingPage } from '@/components/ui/index';
 // ── Route Guards ──────────────────────────────────────────────────────────────
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
   if (isLoading) return <LoadingPage />;
-  return isAuthenticated ? <>{children}</> : <Navigate to="/signin" replace />;
+  return isAuthenticated ? <>{children}</> : <Navigate to="/signin" state={{ from: location }} replace />;
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user } = useAuth();
+  const location = useLocation();
   if (isLoading) return <LoadingPage />;
-  if (!isAuthenticated) return <Navigate to="/signin" replace />;
+  if (!isAuthenticated) return <Navigate to="/signin" state={{ from: location }} replace />;
   if (user?.role !== 'admin') return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 }
 
 function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user } = useAuth();
+  const location = useLocation();
   if (isLoading) return <LoadingPage />;
   if (isAuthenticated) {
-    return <Navigate to={user?.role === 'admin' ? '/admin' : '/dashboard'} replace />;
+    const from = (location.state as any)?.from?.pathname || (user?.role === 'admin' ? '/admin' : '/dashboard');
+    return <Navigate to={from} replace />;
   }
   return <>{children}</>;
 }
@@ -79,7 +83,9 @@ export default function App() {
 
         {/* Auth Routes (redirect if already logged in) */}
         <Route path="/signin" element={<PublicOnlyRoute><SignInPage /></PublicOnlyRoute>} />
+        <Route path="/login" element={<Navigate to="/signin" replace />} />
         <Route path="/signup" element={<PublicOnlyRoute><SignUpPage /></PublicOnlyRoute>} />
+        <Route path="/register" element={<Navigate to="/signup" replace />} />
 
         {/* Dashboard Routes */}
         <Route path="/dashboard" element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>

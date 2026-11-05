@@ -11,6 +11,7 @@ import { clsx } from 'clsx';
 import { Button } from '@/components/ui/Button';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
+import { PostLoginPasswordPrompt } from '@/components/auth/PostLoginPasswordPrompt';
 import toast from 'react-hot-toast';
 
 interface NavGroup {
@@ -26,25 +27,19 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
   {
-    title: 'Threat Intelligence',
+    title: 'THREAT INTELLIGENCE',
     items: [
-      { to: '/dashboard', label: 'Intelligence Overview', icon: <LayoutDashboard className="w-4 h-4" />, exact: true },
-      { to: '/dashboard/analyze/text', label: 'Text Credibility', icon: <FileText className="w-4 h-4" /> },
-      { to: '/dashboard/analyze/url', label: 'URL Threat Scanner', icon: <Globe className="w-4 h-4" /> },
-      { to: '/dashboard/history', label: 'Investigation History', icon: <Clock className="w-4 h-4" /> },
+      { to: '/dashboard', label: 'INTELLIGENCE OVERVIEW', icon: <LayoutDashboard className="w-4 h-4" />, exact: true },
+      { to: '/dashboard/analyze/text', label: 'TEXT CREDIBILITY', icon: <FileText className="w-4 h-4" /> },
+      { to: '/dashboard/analyze/url', label: 'URL THREAT SCANNER', icon: <Globe className="w-4 h-4" /> },
+      { to: '/dashboard/history', label: 'INVESTIGATION HISTORY', icon: <Clock className="w-4 h-4" /> },
     ],
   },
   {
-    title: 'Vault & Intelligence',
+    title: 'VAULT & INTELLIGENCE',
     items: [
-      { to: '/dashboard/digikeeper', label: 'DigiKeeper Vault', icon: <Lock className="w-4 h-4" />, badge: 'AES-256' },
-      { to: '/dashboard/cubbis', label: 'Cubbis Cyber AI', icon: <Bot className="w-4 h-4" />, badge: 'Gemini' },
-    ],
-  },
-  {
-    title: 'Identity & Enclave',
-    items: [
-      { to: '/dashboard/profile', label: 'Profile & Security', icon: <User className="w-4 h-4" /> },
+      { to: '/dashboard/digikeeper', label: 'DIGKEEPER DOCUMENT VAULT', icon: <Lock className="w-4 h-4" /> },
+      { to: '/dashboard/cubbis', label: 'CUBBIS CYBER AI', icon: <Bot className="w-4 h-4" /> },
     ],
   },
 ];
@@ -60,29 +55,39 @@ export default function DashboardLayout() {
     logout();
     setShowLogoutConfirm(false);
     toast.success('Secure session terminated.');
-    navigate('/signin');
+    navigate('/');
   };
 
   const isActive = (to: string, exact = false) =>
     exact ? location.pathname === to : location.pathname.startsWith(to);
 
-  // Find active item label for topbar breadcrumb
-  const allItems = navGroups.flatMap(g => g.items);
-  const currentNav = allItems.find(n => isActive(n.to, n.exact)) || { label: 'Intelligence Overview' };
+  // Find active item label for topbar breadcrumb (original normal title casing)
+  const breadcrumbMap: Record<string, string> = {
+    '/dashboard/analyze/text': 'Text Credibility',
+    '/dashboard/analyze/url': 'URL Threat Scanner',
+    '/dashboard/history': 'Investigation History',
+    '/dashboard/digikeeper': 'DigiKeeper Document Vault',
+    '/dashboard/cubbis': 'Cubbis Cyber AI',
+    '/dashboard/profile': 'Account & Security',
+    '/dashboard': 'Intelligence Overview',
+  };
+  const currentBreadcrumb = Object.entries(breadcrumbMap).find(([to]) =>
+    to === '/dashboard' ? location.pathname === to : location.pathname.startsWith(to)
+  )?.[1] || 'Intelligence Overview';
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-[#0f1629] text-[#e8edf5]">
-      {/* Top Sidebar Branding Container — Expanded height occupying previous header + button space */}
-      <div className="h-[116px] shrink-0 flex items-center px-3.5 border-b border-[#1e2d4f] bg-[#0c1322] relative overflow-hidden">
+      {/* Top Sidebar Branding Container */}
+      <div className="sidebar-brand-container h-20 shrink-0 flex items-center px-4 border-b border-[#1e2d4f] bg-[#0c1322] relative overflow-hidden">
         {/* Subtle cyan ambient glow behind shield */}
-        <div className="absolute -left-6 -top-6 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="sidebar-brand-glow absolute -left-6 -top-6 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 
         <BrandLogo
           size="md"
           linkTo="/dashboard"
           showDivider={true}
           badge="v1.0.0"
-          className="w-full justify-between"
+          className="w-full"
         />
       </div>
 
@@ -133,13 +138,31 @@ export default function DashboardLayout() {
         ))}
       </nav>
 
-      {/* Enclave Status Bar in Sidebar */}
-      <div className="px-3 py-2 border-t border-[#1e2d4f] bg-[#0c1322]/60 text-[11px] text-[#4a6180] font-rajdhani font-bold uppercase tracking-wider flex items-center justify-between">
-        <span className="flex items-center gap-1.5 text-emerald-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          Enclave Online
-        </span>
-        <span className="text-[#4a6180]">Oracle XE 21c</span>
+      {/* Account & Security Navigation Row */}
+      <div className="p-3 border-t border-[#1e2d4f] bg-[#0c1322]/80">
+        <Link
+          to="/dashboard/profile"
+          onClick={() => setSidebarOpen(false)}
+          className={clsx(
+            'flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-outfit tracking-wide transition-all group relative',
+            isActive('/dashboard/profile')
+              ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-sm shadow-cyan-500/10 font-semibold'
+              : 'text-[#8fa3bf] hover:text-[#e8edf5] hover:bg-white/5 font-medium'
+          )}
+        >
+          <span className={clsx(
+            'shrink-0 transition-colors',
+            isActive('/dashboard/profile') ? 'text-cyan-400' : 'text-[#4a6180] group-hover:text-cyan-400'
+          )}>
+            <ShieldCheck className="w-4 h-4" />
+          </span>
+          <span className="truncate font-rajdhani uppercase font-bold tracking-wider">Account & Security</span>
+          {isActive('/dashboard/profile') ? (
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 ml-auto shadow-[0_0_6px_#00d4ff]" />
+          ) : (
+            <ChevronRight className="w-3.5 h-3.5 ml-auto text-[#4a6180] group-hover:text-cyan-400 transition-transform group-hover:translate-x-0.5" />
+          )}
+        </Link>
       </div>
 
       {/* User Info / Identity Footer */}
@@ -177,7 +200,7 @@ export default function DashboardLayout() {
   return (
     <div className="flex h-screen bg-[#0a0f1a] overflow-hidden text-[#e8edf5]">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-[#0f1629] border-r border-[#1e2d4f] shrink-0 z-20">
+      <aside className="hidden md:flex flex-col w-72 bg-[#0f1629] border-r border-[#1e2d4f] shrink-0 z-20">
         <SidebarContent />
       </aside>
 
@@ -216,7 +239,7 @@ export default function DashboardLayout() {
               </span>
               <ChevronRight className="w-3 h-3 text-[#4a6180]" />
               <span className="text-[#e8edf5] font-outfit font-medium">
-                {currentNav.label}
+                {currentBreadcrumb}
               </span>
             </div>
           </div>
@@ -226,7 +249,7 @@ export default function DashboardLayout() {
             {/* Quick URL / Text scan shortcut on larger screens */}
             <Link
               to="/dashboard/analyze/url"
-              className="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-outfit font-medium text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 rounded-lg border border-cyan-500/30 transition-colors"
+              className="topbar-investigate-btn hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-outfit font-medium text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 rounded-lg border border-cyan-500/30 transition-colors"
             >
               <Globe className="w-3.5 h-3.5 text-cyan-400" />
               <span>Investigate URL</span>
@@ -256,8 +279,8 @@ export default function DashboardLayout() {
 
       {/* Logout Confirmation Dialog */}
       {showLogoutConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#131d35] border border-[#1e2d4f] rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+        <div className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+          <div className="modal-surface bg-[#131d35] border border-[#1e2d4f] rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
                 <LogOut className="w-5 h-5 text-red-400" />
@@ -293,6 +316,9 @@ export default function DashboardLayout() {
           </div>
         </div>
       )}
+
+      {/* Post-Login Security Assessment & Optional Password Update */}
+      <PostLoginPasswordPrompt />
     </div>
   );
 }

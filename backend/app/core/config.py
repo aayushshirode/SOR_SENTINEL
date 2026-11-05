@@ -54,6 +54,11 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = "gemini-3-flash-preview"
     GEMINI_TIMEOUT: int = 45
 
+    # Resend Email Service
+    RESEND_API_KEY: str = ""
+    RESEND_FROM_EMAIL: str = "onboarding@resend.dev"
+    RESEND_TEST_RECIPIENT_EMAIL: str = "aayushshirode2007@gmail.com"
+
     # Frontend
     FRONTEND_ORIGIN: str = "http://localhost:5173"
 

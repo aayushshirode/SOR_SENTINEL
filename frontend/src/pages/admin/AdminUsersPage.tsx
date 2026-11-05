@@ -157,10 +157,10 @@ export default function AdminUsersPage() {
                           {u.is_active ? 'Active' : 'Inactive'}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3.5 text-center font-mono text-[#e8edf5]">
+                      <td className="px-4 py-3.5 text-center font-numeric font-bold text-[#e8edf5]">
                         {u.analysis_count}
                       </td>
-                      <td className="px-4 py-3.5 text-xs text-[#8fa3bf] whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-xs text-[#8fa3bf] font-numeric whitespace-nowrap">
                         {u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}
                       </td>
                       <td className="px-4 py-3.5 text-right">

@@ -307,7 +307,7 @@ export default function AnalysisHistoryPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 pt-3 border-t border-[#1e2d4f]/60 text-xs">
           {/* Type Filter */}
           <div>
-            <label className="text-[11px] font-mono font-bold text-[#4a6180] uppercase tracking-wider block mb-1">
+            <label className="text-[11px] font-mono font-medium text-[#4a6180] block mb-1">
               Analysis Type
             </label>
             <select
@@ -323,7 +323,7 @@ export default function AnalysisHistoryPage() {
 
           {/* Verdict Filter */}
           <div>
-            <label className="text-[11px] font-mono font-bold text-[#4a6180] uppercase tracking-wider block mb-1">
+            <label className="text-[11px] font-mono font-medium text-[#4a6180] block mb-1">
               Assessment Verdict
             </label>
             <select
@@ -342,7 +342,7 @@ export default function AnalysisHistoryPage() {
 
           {/* Sensitivity Filter */}
           <div>
-            <label className="text-[11px] font-mono font-bold text-[#4a6180] uppercase tracking-wider block mb-1">
+            <label className="text-[11px] font-mono font-medium text-[#4a6180] block mb-1">
               Sensitivity Rating
             </label>
             <select
@@ -360,7 +360,7 @@ export default function AnalysisHistoryPage() {
 
           {/* Start Date */}
           <div>
-            <label className="text-[11px] font-mono font-bold text-[#4a6180] uppercase tracking-wider block mb-1">
+            <label className="text-[11px] font-mono font-medium text-[#4a6180] block mb-1">
               From Date
             </label>
             <input
@@ -373,7 +373,7 @@ export default function AnalysisHistoryPage() {
 
           {/* End Date */}
           <div className="col-span-2 sm:col-span-1">
-            <label className="text-[11px] font-mono font-bold text-[#4a6180] uppercase tracking-wider block mb-1">
+            <label className="text-[11px] font-mono font-medium text-[#4a6180] block mb-1">
               To Date
             </label>
             <input
@@ -431,11 +431,11 @@ export default function AnalysisHistoryPage() {
         </Card>
       ) : (
         <>
-          <div className="rounded-2xl border border-[#1e2d4f] overflow-hidden bg-[#0f1629] shadow-xl">
+          <div className="analysis-table-container rounded-2xl border border-[#1e2d4f] overflow-hidden bg-[#0f1629] shadow-xl">
             <div className="overflow-x-auto">
               <table className="w-full text-sm font-plex">
                 <thead>
-                  <tr className="border-b border-[#1e2d4f] bg-[#0c1427] text-[11px] font-rajdhani font-bold text-[#4a6180] uppercase tracking-wider">
+                  <tr className="border-b border-[#1e2d4f] bg-[#0c1427] text-[11px] font-rajdhani font-semibold text-[#4a6180]">
                     <th className="text-left px-3 py-3 w-12">No.</th>
                     <th className="text-left px-3 py-3">ID</th>
                     <th className="text-left px-4 py-3">Type</th>
@@ -452,16 +452,16 @@ export default function AnalysisHistoryPage() {
                     <tr
                       key={item.id}
                       onClick={() => openQuickView(item.id)}
-                      className="bg-[#131d35]/60 hover:bg-[#1a2540] transition-colors cursor-pointer group"
+                      className="analysis-table-row border-b border-[#1e2d4f] transition-colors cursor-pointer group"
                       title="Click row to open quick threat inspection"
                     >
                       {/* Sequential Presentation Row Number */}
-                      <td className="px-3 py-3.5 whitespace-nowrap text-xs font-rajdhani font-bold text-[#4a6180]">
+                      <td className="px-3 py-3.5 whitespace-nowrap text-xs font-numeric font-bold text-[#4a6180]">
                         {String((page - 1) * 20 + idx + 1).padStart(2, '0')}
                       </td>
 
                       {/* Permanent Immutable Database Analysis ID */}
-                      <td className="px-3 py-3.5 whitespace-nowrap font-rajdhani text-xs font-bold text-cyan-400 tracking-wider">
+                      <td className="px-3 py-3.5 whitespace-nowrap font-numeric text-xs font-bold text-cyan-400 tracking-wider">
                         #TR-{String(item.id).padStart(5, '0')}
                       </td>
 
@@ -500,7 +500,7 @@ export default function AnalysisHistoryPage() {
                       <td className="px-4 py-3.5 whitespace-nowrap">
                         {item.credibility_score != null ? (
                           <span
-                            className={`font-space font-bold text-xs ${
+                            className={`font-numeric font-bold text-xs ${
                               item.credibility_score >= 70
                                 ? 'text-emerald-400'
                                 : item.credibility_score >= 40
@@ -527,7 +527,7 @@ export default function AnalysisHistoryPage() {
                       </td>
 
                       {/* Date */}
-                      <td className="px-4 py-3.5 text-[#8fa3bf] text-xs font-mono whitespace-nowrap" title={formatKolkataDateTime(item.created_at)}>
+                      <td className="px-4 py-3.5 text-[#8fa3bf] text-xs font-numeric whitespace-nowrap" title={formatKolkataDateTime(item.created_at)}>
                         {formatKolkataDateTime(item.created_at)}
                       </td>
 
@@ -567,14 +567,14 @@ export default function AnalysisHistoryPage() {
           </div>
 
           {/* ── Pagination Controls ─────────────────────────────────────────── */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-[#0f1629] border border-[#1e2d4f] rounded-2xl text-xs text-[#8fa3bf]">
+          <div className="pagination-bar flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-[#0f1629] border border-[#1e2d4f] rounded-2xl text-xs text-[#8fa3bf]">
             <div className="flex items-center gap-3">
               <span>
-                Showing {((page - 1) * pageSize) + 1}–{Math.min(page * pageSize, data?.total ?? 0)} of{' '}
-                <strong className="text-[#e8edf5] font-mono">{data?.total ?? 0}</strong> records
+                Showing <span className="font-numeric font-medium">{((page - 1) * pageSize) + 1}–{Math.min(page * pageSize, data?.total ?? 0)}</span> of{' '}
+                <strong className="text-[#e8edf5] font-numeric font-bold">{data?.total ?? 0}</strong> records
               </span>
 
-              <div className="flex items-center gap-1.5 font-mono">
+              <div className="flex items-center gap-1.5 font-numeric">
                 <span>Per page:</span>
                 <select
                   value={pageSize}
@@ -582,7 +582,7 @@ export default function AnalysisHistoryPage() {
                     setPageSize(Number(e.target.value));
                     setPage(1);
                   }}
-                  className="bg-[#131d35] border border-[#1e2d4f] text-[#e8edf5] rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-cyan-500 cursor-pointer"
+                  className="bg-[#131d35] border border-[#1e2d4f] text-[#e8edf5] rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-cyan-500 cursor-pointer font-numeric"
                 >
                   <option value={10}>10</option>
                   <option value={25}>25</option>
@@ -591,7 +591,7 @@ export default function AnalysisHistoryPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 font-mono">
+            <div className="flex items-center gap-2 font-numeric">
               <span className="mr-2">
                 Page {page} of {totalPages}
               </span>

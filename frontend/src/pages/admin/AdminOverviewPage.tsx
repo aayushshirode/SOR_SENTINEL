@@ -122,7 +122,7 @@ export default function AdminOverviewPage() {
                   <span className="text-xs font-semibold text-[#8fa3bf] uppercase tracking-wider">
                     {card.title}
                   </span>
-                  <div className="text-2xl font-black text-[#e8edf5] mt-1">
+                  <div className="text-2xl font-bold font-numeric text-[#e8edf5] mt-1">
                     {card.value}
                   </div>
                 </div>

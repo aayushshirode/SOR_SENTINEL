@@ -59,12 +59,20 @@ class UserResponse(BaseModel):
     email: str
     role: str
     is_active: bool
+    is_verified: bool = True
     avatar_url: Optional[str] = None
     created_at: datetime
     last_login_at: Optional[datetime] = None
     previous_login_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
+
+    @field_validator("is_verified", mode="before")
+    @classmethod
+    def default_is_verified(cls, v: Optional[bool]) -> bool:
+        if v is None:
+            return True
+        return bool(v)
 
     @field_validator("created_at", "last_login_at", "previous_login_at", mode="after")
     @classmethod
@@ -130,3 +138,81 @@ class FeedbackSubmission(BaseModel):
 class ReviewSubmission(BaseModel):
     rating: int = Field(..., ge=1, le=5)
     review: Optional[str] = Field(None, max_length=1000)
+
+
+# ── OTP & Password Recovery Schemas ───────────────────────────────────────────
+
+class SignupInitiateResponse(BaseModel):
+    requires_verification: bool = True
+    email: str
+    message: str
+
+
+class VerifySignupOtpRequest(BaseModel):
+    email: EmailStr
+    otp: str = Field(..., min_length=6, max_length=6)
+
+
+class ResendOtpRequest(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class VerifyResetOtpRequest(BaseModel):
+    email: EmailStr
+    otp: str = Field(..., min_length=6, max_length=6)
+
+
+class VerifyResetOtpResponse(BaseModel):
+    reset_token: str
+    message: str
+
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    reset_token: str = Field(..., min_length=16)
+    new_password: str = Field(..., min_length=8, max_length=128)
+    confirm_password: str = Field(..., min_length=8, max_length=128)
+
+    @field_validator("new_password")
+    @classmethod
+    def new_password_strength(cls, v: str) -> str:
+        if not re.search(r"[A-Z]", v):
+            raise ValueError("Password must contain at least one uppercase letter.")
+        if not re.search(r"[a-z]", v):
+            raise ValueError("Password must contain at least one lowercase letter.")
+        if not re.search(r"\d", v):
+            raise ValueError("Password must contain at least one digit.")
+        return v
+
+    @model_validator(mode="after")
+    def passwords_match(self) -> "ResetPasswordRequest":
+        if self.new_password != self.confirm_password:
+            raise ValueError("Passwords do not match.")
+        return self
+
+
+class DirectPasswordUpdate(BaseModel):
+    new_password: str = Field(..., min_length=8, max_length=128)
+    confirm_password: str = Field(..., min_length=8, max_length=128)
+
+    @field_validator("new_password")
+    @classmethod
+    def new_password_strength(cls, v: str) -> str:
+        if not re.search(r"[A-Z]", v):
+            raise ValueError("Password must contain at least one uppercase letter.")
+        if not re.search(r"[a-z]", v):
+            raise ValueError("Password must contain at least one lowercase letter.")
+        if not re.search(r"\d", v):
+            raise ValueError("Password must contain at least one digit.")
+        return v
+
+    @model_validator(mode="after")
+    def passwords_match(self) -> "DirectPasswordUpdate":
+        if self.new_password != self.confirm_password:
+            raise ValueError("Passwords do not match.")
+        return self
+

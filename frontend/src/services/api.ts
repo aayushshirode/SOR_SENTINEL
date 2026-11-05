@@ -5,6 +5,7 @@ import type {
   DashboardSummary, DashboardActivity, ContactForm, ApiError,
   DigiKeeperDocument, DocumentListResponse, DocumentUploadResponse, DocumentDeleteResponse,
   CubbisChatRequest, CubbisChatResponse, CubbisConversationDetail, CubbisConversationListResponse, CubbisDeleteResponse,
+  SignupInitiateResponse, VerifyResetOtpResponse,
 } from '@/types';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api/v1';
@@ -71,7 +72,27 @@ export const authApi = {
   register: (data: {
     full_name: string; email: string; password: string;
     confirm_password: string; terms_accepted: boolean;
-  }) => api.post<TokenResponse>('/auth/register', data),
+  }) => api.post<SignupInitiateResponse>('/auth/register', data),
+
+  verifySignupOtp: (email: string, otp: string) =>
+    api.post<TokenResponse>('/auth/verify-signup-otp', { email, otp }),
+
+  resendSignupOtp: (email: string) =>
+    api.post<{ message: string }>('/auth/resend-signup-otp', { email }),
+
+  forgotPassword: (email: string) =>
+    api.post<{ message: string; email: string }>('/auth/forgot-password', { email }),
+
+  verifyResetOtp: (email: string, otp: string) =>
+    api.post<VerifyResetOtpResponse>('/auth/verify-reset-otp', { email, otp }),
+
+  resetPassword: (data: {
+    email: string; reset_token: string; new_password: string; confirm_password: string;
+  }) => api.post<{ message: string }>('/auth/reset-password', data),
+
+  secureAccountPassword: (data: {
+    new_password: string; confirm_password: string;
+  }) => api.post<{ message: string }>('/auth/secure-account-password', data),
 
   login: (email: string, password: string) =>
     api.post<TokenResponse>('/auth/login', { email, password }),
@@ -201,6 +222,11 @@ export const digikeeperApi = {
     window.URL.revokeObjectURL(url);
     return response;
   },
+
+  getBlob: (id: number) =>
+    api.get(`/digikeeper/documents/${id}/download`, {
+      responseType: 'blob',
+    }),
 
   delete: (id: number) =>
     api.delete<DocumentDeleteResponse>(`/digikeeper/documents/${id}`),

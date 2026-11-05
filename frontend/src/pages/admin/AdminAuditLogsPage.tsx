@@ -125,7 +125,7 @@ export default function AdminAuditLogsPage() {
                       </td>
                       <td className="px-4 py-3.5 text-xs text-[#e8edf5]">
                         {log.user_id != null ? (
-                          <span className="font-mono">User #{log.user_id}</span>
+                          <span className="font-numeric">User #{log.user_id}</span>
                         ) : (
                           <span className="text-[#4a6180] italic">System / Anonymous</span>
                         )}
@@ -142,7 +142,7 @@ export default function AdminAuditLogsPage() {
                       <td className="px-4 py-3.5 font-mono text-xs text-[#8fa3bf]">
                         {log.ip_address || '—'}
                       </td>
-                      <td className="px-4 py-3.5 text-right text-xs text-[#8fa3bf] whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-right text-xs text-[#8fa3bf] font-numeric whitespace-nowrap">
                         {new Date(log.created_at).toLocaleString()}
                       </td>
                     </tr>
@@ -154,7 +154,7 @@ export default function AdminAuditLogsPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between text-xs text-[#8fa3bf]">
+            <div className="flex items-center justify-between text-xs text-[#8fa3bf] font-numeric">
               <div>
                 Showing page {page} of {totalPages} ({total} events recorded)
               </div>

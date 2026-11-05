@@ -14,10 +14,14 @@
       (function() {
         try {
           var t = localStorage.getItem('sor_theme') || 'default';
-          if (t === 'light') {
-            document.documentElement.setAttribute('data-theme', 'light');
-          } else if (t === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
+          if (t === 'light' || t === 'dark') {
+            t = 'peachy';
+            localStorage.setItem('sor_theme', 'peachy');
+          }
+          if (t === 'midnight') {
+            document.documentElement.setAttribute('data-theme', 'midnight');
+          } else if (t === 'peachy') {
+            document.documentElement.setAttribute('data-theme', 'peachy');
           } else {
             document.documentElement.removeAttribute('data-theme');
           }

@@ -1,12 +1,40 @@
+# Environment & Secrets (Never commit actual credentials)
 .env
-.env.*
+*.env
+backend/.env
+frontend/.env
+*.pem
+*.key
 !.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# Dependencies & Build Artefacts
 node_modules/
 **/node_modules/
 dist/
 **/dist/
 build/
+
+# Python Virtual Environments & Caches
 venv/
 .venv/
+env/
 __pycache__/
-*.pyc
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+**/.pytest_cache/
+.coverage
+htmlcov/
+
+# Netlify local folders
+.netlify/
+
+# OS & Editor Artifacts
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/

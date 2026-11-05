@@ -5,13 +5,17 @@ import {
   FileText, Globe, CheckCircle2, AlertTriangle, PlusCircle,
   TrendingUp, Clock, BarChart2, ShieldAlert, ShieldCheck, Lock, Bot,
   ChevronRight, ArrowUpRight, Activity, Terminal, Shield, RefreshCw,
-  Search, SlidersHorizontal, Check, AlertCircle, Sparkles
+  Search, SlidersHorizontal, Check, AlertCircle, Sparkles, PieChart as PieIcon,
+  Layers, Filter
 } from 'lucide-react';
 import { dashboardApi, extractErrorMessage } from '@/services/api';
 import type { DashboardSummary, DashboardActivity } from '@/types';
 import { Card, Badge, Skeleton, EmptyState, ErrorState } from '@/components/ui/index';
 import { Button } from '@/components/ui/Button';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell
+} from 'recharts';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, parseISO } from 'date-fns';
 
@@ -38,7 +42,11 @@ function sensitivityBadge(level?: string) {
     low: 'success', medium: 'warning', high: 'error', critical: 'error',
     LOW: 'success', MEDIUM: 'warning', HIGH: 'error', CRITICAL: 'error',
   };
-  return level ? <Badge variant={map[level] || 'neutral'} className="font-rajdhani font-bold tracking-wider">{level.toUpperCase()}</Badge> : <Badge variant="neutral">—</Badge>;
+  return level ? (
+    <Badge variant={map[level] || 'neutral'} className="font-rajdhani font-bold tracking-wider">
+      {level.toUpperCase()}
+    </Badge>
+  ) : <Badge variant="neutral">—</Badge>;
 }
 
 export default function DashboardOverview() {
@@ -51,6 +59,7 @@ export default function DashboardOverview() {
   const [activityLoading, setActivityLoading] = useState(false);
   const [error, setError] = useState('');
   const [recentFilter, setRecentFilter] = useState<'all' | 'url' | 'text'>('all');
+  const [activePieIndex, setActivePieIndex] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -114,6 +123,77 @@ export default function DashboardOverview() {
     }, 0);
   }, [sensitivityEntries]);
 
+  // Statistical distribution pie chart mode & real data
+  const [pieMode, setPieMode] = useState<'verdict' | 'sensitivity'>('verdict');
+  const pieChartData = useMemo(() => {
+    if (!summary) return [];
+    if (pieMode === 'verdict') {
+      const entries = Object.entries(summary.assessment_distribution || {});
+      const colors = ['#10b981', '#ef4444', '#f59e0b', '#00d4ff', '#8b5cf6', '#ec4899', '#3b82f6'];
+      return entries
+        .filter(([_, count]) => count > 0)
+        .map(([name, count], index) => {
+          const lower = name.toLowerCase();
+          let color = colors[index % colors.length];
+          if (lower.includes('credible') || lower.includes('legitimate') || lower.includes('low')) color = '#10b981';
+          else if (lower.includes('misleading') || lower.includes('phishing') || lower.includes('untrustworthy')) color = '#ef4444';
+          else if (lower.includes('sensitive') || lower.includes('suspicious') || lower.includes('caution')) color = '#f59e0b';
+          else if (lower.includes('verification') || lower.includes('inconclusive')) color = '#00d4ff';
+          return {
+            name: name,
+            value: count,
+            color,
+          };
+        });
+    } else {
+      const entries = Object.entries(summary.sensitivity_distribution || {});
+      const colorsMap: Record<string, string> = {
+        low: '#10b981',
+        medium: '#f59e0b',
+        high: '#f97316',
+        critical: '#ef4444',
+      };
+      return entries
+        .filter(([_, count]) => count > 0)
+        .map(([name, count]) => ({
+          name: `${name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()} Sensitivity`,
+          value: count,
+          color: colorsMap[name.toLowerCase()] || '#8b5cf6',
+        }));
+    }
+  }, [summary, pieMode]);
+
+  // Custom Interactive Tooltip for Pie Chart
+  const CustomPieTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const pct = totalCount > 0 ? ((data.value / totalCount) * 100).toFixed(1) : '0';
+      return (
+        <div className="p-3 rounded-xl bg-[#131d35] border border-[#1e2d4f] shadow-2xl space-y-1.5 font-plex text-xs pie-tooltip-box">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: data.color }} />
+            <span className="font-space font-bold text-[#e8edf5] tracking-wide">
+              {data.name}
+            </span>
+          </div>
+          <div className="flex items-baseline justify-between gap-4 pt-1 font-numeric border-t border-[#1e2d4f]/50">
+            <span className="text-[#8fa3bf] font-bold text-[10px]">Record Count:</span>
+            <span className="font-bold text-[#e8edf5]" style={{ color: data.color }}>
+              {data.value} {data.value === 1 ? 'scan' : 'scans'}
+            </span>
+          </div>
+          <div className="flex items-baseline justify-between gap-4 font-numeric">
+            <span className="text-[#8fa3bf] font-bold text-[10px]">Enclave Share:</span>
+            <span className="font-bold text-[#e8edf5]">
+              {pct}%
+            </span>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   if (loading) {
     return (
       <div className="space-y-6 animate-fade-in max-w-7xl mx-auto">
@@ -153,7 +233,7 @@ export default function DashboardOverview() {
   return (
     <div className="space-y-8 animate-fade-in max-w-7xl mx-auto pb-12">
       {/* ── 1. Cyber Enclave Welcome & Telemetry Banner ─────────────────────── */}
-      <div className="relative rounded-2xl overflow-hidden border border-[#1e2d4f] bg-gradient-to-r from-[#0c1427] via-[#101b33] to-[#0c1427] p-6 shadow-2xl">
+      <div className="dashboard-hero-banner relative rounded-2xl overflow-hidden border border-[#1e2d4f] bg-gradient-to-r from-[#0c1427] via-[#101b33] to-[#0c1427] p-6 shadow-2xl">
         {/* Background glow & subtle cyber grid */}
         <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 via-transparent to-transparent pointer-events-none" />
         <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
@@ -161,20 +241,20 @@ export default function DashboardOverview() {
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-rajdhani font-bold tracking-wider uppercase bg-cyan-500/10 text-cyan-400 border border-cyan-500/25">
+              <span className="hero-status-pill inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-rajdhani font-bold tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/25">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                INTELLIGENCE SENSOR ENCLAVE
+                Intelligence Sensor Enclave
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-rajdhani font-semibold tracking-wider uppercase bg-[#1e2d4f]/60 text-[#8fa3bf]">
+              <span className="hero-oracle-pill inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-rajdhani font-bold tracking-wider bg-[#1e2d4f]/60 text-[#8fa3bf]">
                 <Activity className="w-3 h-3 text-emerald-400" />
                 Live Oracle 21c XE
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#e8edf5] tracking-tight font-space">
+            <h1 className="dashboard-hero-title text-2xl sm:text-3xl font-extrabold text-[#e8edf5] tracking-tight font-space">
               Security Operations Center
             </h1>
-            <p className="text-sm text-[#8fa3bf] max-w-2xl leading-relaxed font-plex">
+            <p className="text-xs sm:text-sm text-[#8fa3bf] max-w-2xl leading-relaxed font-plex">
               Real-time misinformation telemetry, AI source credibility classification, and encrypted cryptographic vault monitoring.
             </p>
           </div>
@@ -215,22 +295,36 @@ export default function DashboardOverview() {
         </div>
 
         {/* Threat Level Quick Ticker */}
-        <div className="mt-5 pt-4 border-t border-[#1e2d4f]/80 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-rajdhani">
+        <div className="hero-ticker mt-5 pt-4 border-t border-[#1e2d4f]/80 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-rajdhani">
           <div>
-            <span className="text-[#4a6180] block text-[11px] uppercase font-bold tracking-wider">Total Enclave Scans</span>
-            <span className="text-cyan-400 font-extrabold text-sm tracking-wide">{totalCount.toLocaleString()} Verified</span>
+            <span className="ticker-label text-[#4a6180] block text-[11px] font-bold tracking-wider">
+              Total Enclave Scans
+            </span>
+            <span className="text-cyan-400 font-extrabold text-sm tracking-wide font-numeric">
+              {totalCount.toLocaleString()} <span className="font-rajdhani text-xs font-bold tracking-wider text-[#8fa3bf]">Verified</span>
+            </span>
           </div>
           <div>
-            <span className="text-[#4a6180] block text-[11px] uppercase font-bold tracking-wider">Credible Verdicts</span>
-            <span className="text-emerald-400 font-extrabold text-sm tracking-wide">{credibleCount} Safe Entities</span>
+            <span className="ticker-label text-[#4a6180] block text-[11px] font-bold tracking-wider">
+              Credible Verdicts
+            </span>
+            <span className="text-emerald-400 font-extrabold text-sm tracking-wide font-numeric">
+              {credibleCount} <span className="font-rajdhani text-xs font-bold tracking-wider text-emerald-400/80">Safe Entities</span>
+            </span>
           </div>
           <div>
-            <span className="text-[#4a6180] block text-[11px] uppercase font-bold tracking-wider">High Sensitivity Alerts</span>
-            <span className="text-orange-400 font-extrabold text-sm tracking-wide">{highRiskCount} Flagged</span>
+            <span className="ticker-label text-[#4a6180] block text-[11px] font-bold tracking-wider">
+              High Sensitivity Alerts
+            </span>
+            <span className="text-orange-400 font-extrabold text-sm tracking-wide font-numeric">
+              {highRiskCount} <span className="font-rajdhani text-xs font-bold tracking-wider text-orange-400/80">Flagged</span>
+            </span>
           </div>
           <div>
-            <span className="text-[#4a6180] block text-[11px] uppercase font-bold tracking-wider">Enclave Engine</span>
-            <span className="text-emerald-400 font-extrabold text-sm flex items-center gap-1 tracking-wide">
+            <span className="ticker-label text-[#4a6180] block text-[11px] font-bold tracking-wider">
+              Enclave Engine
+            </span>
+            <span className="text-emerald-400 font-extrabold text-sm flex items-center gap-1 tracking-wide font-rajdhani font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               Connected
             </span>
@@ -241,20 +335,22 @@ export default function DashboardOverview() {
       {/* ── 2. Primary KPI Telemetry Cards ───────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Analyses */}
-        <Card className="p-5 border-[#1e2d4f] hover:border-cyan-500/40 transition-all shadow-md group">
+        <Card className="kpi-metric-card p-5 border-[#1e2d4f] hover:border-cyan-500/40 transition-all shadow-md group">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold font-rajdhani uppercase tracking-wider text-[#8fa3bf]">
+            <span className="text-xs font-bold font-space text-[#8fa3bf]">
               Total Analyses
             </span>
-            <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+            <div className="kpi-icon-coral w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
               <BarChart2 className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="text-3xl font-extrabold text-[#e8edf5] font-space tracking-tight">
+            <span className="text-3xl font-bold text-[#e8edf5] font-numeric tracking-tight">
               {(summary?.total_analyses ?? 0).toLocaleString()}
             </span>
-            <span className="text-xs text-cyan-400 font-outfit font-medium">Recorded</span>
+            <span className="text-xs text-cyan-400 font-outfit font-medium">
+              Recorded
+            </span>
           </div>
           <p className="text-[11px] text-[#4a6180] font-plex mt-2 pt-2 border-t border-[#1e2d4f]/60 truncate">
             Persisted in Oracle 21c XE
@@ -262,20 +358,20 @@ export default function DashboardOverview() {
         </Card>
 
         {/* Text Analyses */}
-        <Card className="p-5 border-[#1e2d4f] hover:border-violet-500/40 transition-all shadow-md group">
+        <Card className="kpi-metric-card p-5 border-[#1e2d4f] hover:border-violet-500/40 transition-all shadow-md group">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold font-rajdhani uppercase tracking-wider text-[#8fa3bf]">
+            <span className="text-xs font-bold font-space text-[#8fa3bf]">
               Text Credibility
             </span>
-            <div className="w-9 h-9 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform">
+            <div className="kpi-icon-blush w-9 h-9 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform">
               <FileText className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="text-3xl font-extrabold text-violet-300 font-space tracking-tight">
+            <span className="text-3xl font-bold text-violet-300 font-numeric tracking-tight">
               {(summary?.text_analyses ?? 0).toLocaleString()}
             </span>
-            <span className="text-xs text-violet-400 font-outfit font-medium">
+            <span className="text-xs text-violet-400 font-numeric font-medium">
               {totalCount > 0 ? Math.round(((summary?.text_analyses ?? 0) / totalCount) * 100) : 0}% share
             </span>
           </div>
@@ -285,20 +381,20 @@ export default function DashboardOverview() {
         </Card>
 
         {/* URL Analyses */}
-        <Card className="p-5 border-[#1e2d4f] hover:border-blue-500/40 transition-all shadow-md group">
+        <Card className="kpi-metric-card p-5 border-[#1e2d4f] hover:border-blue-500/40 transition-all shadow-md group">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold font-rajdhani uppercase tracking-wider text-[#8fa3bf]">
+            <span className="text-xs font-bold font-space text-[#8fa3bf]">
               URL Investigations
             </span>
-            <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+            <div className="kpi-icon-coral w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
               <Globe className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="text-3xl font-extrabold text-blue-300 font-space tracking-tight">
+            <span className="text-3xl font-bold text-blue-300 font-numeric tracking-tight">
               {(summary?.url_analyses ?? 0).toLocaleString()}
             </span>
-            <span className="text-xs text-blue-400 font-outfit font-medium">
+            <span className="text-xs text-blue-400 font-numeric font-medium">
               {totalCount > 0 ? Math.round(((summary?.url_analyses ?? 0) / totalCount) * 100) : 0}% share
             </span>
           </div>
@@ -308,20 +404,20 @@ export default function DashboardOverview() {
         </Card>
 
         {/* Completed Operations */}
-        <Card className="p-5 border-[#1e2d4f] hover:border-emerald-500/40 transition-all shadow-md group">
+        <Card className="kpi-metric-card p-5 border-[#1e2d4f] hover:border-emerald-500/40 transition-all shadow-md group">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold font-rajdhani uppercase tracking-wider text-[#8fa3bf]">
+            <span className="text-xs font-bold font-space text-[#8fa3bf]">
               Completed Scans
             </span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+            <div className="kpi-icon-blush w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="text-3xl font-extrabold text-emerald-300 font-space tracking-tight">
+            <span className="text-3xl font-bold text-emerald-300 font-numeric tracking-tight">
               {(summary?.completed_analyses ?? 0).toLocaleString()}
             </span>
-            <span className="text-xs text-emerald-400 font-outfit font-medium">
+            <span className="text-xs text-emerald-400 font-numeric font-medium">
               {totalCount > 0 ? Math.round(((summary?.completed_analyses ?? 0) / totalCount) * 100) : 100}% success
             </span>
           </div>
@@ -331,132 +427,286 @@ export default function DashboardOverview() {
         </Card>
       </div>
 
-      {/* ── 3. Interactive Chronological Activity Timeline ───────────────────── */}
-      <Card className="p-6 border-[#1e2d4f] shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
-              <TrendingUp className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="font-bold text-[#e8edf5] text-base">
-                Chronological Threat Analysis Activity
-              </h3>
-              <p className="text-xs text-[#8fa3bf] mt-0.5">
-                {activityView === 'daily'
-                  ? 'Daily scan density across the last 30 days'
-                  : activityView === 'weekly'
-                  ? 'Weekly aggregated threat volume (Last 12 Weeks)'
-                  : 'Monthly threat volume (Last 12 Months)'}
-              </p>
-            </div>
-          </div>
+      {/* ── 3. Chronological Activity Timeline & Redesigned Statistical Threat Distribution Chart ───── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Chronological Activity Chart (Left Column) */}
+        <Card className="dashboard-chart-card lg:col-span-7 p-6 border-[#1e2d4f] shadow-xl flex flex-col justify-between">
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+                  <TrendingUp className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#e8edf5] text-base font-space">
+                    Chronological Threat Analysis Activity
+                  </h3>
+                  <p className="text-xs text-[#8fa3bf] mt-0.5 font-plex">
+                    {activityView === 'daily'
+                      ? 'Daily scan density across the last 30 days'
+                      : activityView === 'weekly'
+                      ? 'Weekly aggregated threat volume (last 12 weeks)'
+                      : 'Monthly threat volume (last 12 months)'}
+                  </p>
+                </div>
+              </div>
 
-          {/* Granularity Selector */}
-          <div className="flex items-center gap-1 p-1 bg-[#0a0f1a] rounded-xl border border-[#1e2d4f] self-start sm:self-auto font-outfit">
-            {(['daily', 'weekly', 'monthly'] as const).map((view) => (
-              <button
-                key={view}
-                type="button"
-                onClick={() => changeActivityView(view)}
-                disabled={activityLoading}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all font-outfit ${
-                  activityView === view
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-                    : 'text-[#8fa3bf] hover:text-[#e8edf5] hover:bg-white/5'
-                }`}
-              >
-                {view}
-              </button>
-            ))}
-          </div>
-        </div>
+              {/* Granularity Selector */}
+              <div className="chart-tab-group flex items-center gap-1 p-1 bg-[#0a0f1a] rounded-xl border border-[#1e2d4f] self-start sm:self-auto font-outfit">
+                {(['daily', 'weekly', 'monthly'] as const).map((view) => (
+                  <button
+                    key={view}
+                    type="button"
+                    onClick={() => changeActivityView(view)}
+                    disabled={activityLoading}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all font-outfit ${
+                      activityView === view
+                        ? 'chart-tab-active bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm font-semibold'
+                        : 'chart-tab-inactive text-[#8fa3bf] hover:text-[#e8edf5] hover:bg-white/5'
+                    }`}
+                  >
+                    {view}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        {activity && activity.data.length > 0 ? (
-          <div className="w-full h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={activity.data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="cyberActivityGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#00d4ff" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#00d4ff" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4f" opacity={0.6} />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fill: '#4a6180', fontSize: 11 }}
-                  tickFormatter={(d: string) => {
-                    try {
-                      const parsed = parseISO(d);
-                      if (activityView === 'monthly') return format(parsed, 'MMM yyyy');
-                      return format(parsed, 'MMM d');
-                    } catch {
-                      return d;
-                    }
-                  }}
-                />
-                <YAxis tick={{ fill: '#4a6180', fontSize: 11 }} allowDecimals={false} />
-                <Tooltip
-                  contentStyle={{
-                    background: '#131d35',
-                    borderColor: '#1e2d4f',
-                    borderRadius: 12,
-                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
-                  }}
-                  labelStyle={{ color: '#8fa3bf', fontSize: 11, fontWeight: 700 }}
-                  itemStyle={{ color: '#00d4ff', fontSize: 12, fontWeight: 600 }}
-                  formatter={(val: number) => [`${val} ${val === 1 ? 'Scan' : 'Scans'}`, 'Volume']}
-                  labelFormatter={(v: string) => {
-                    try {
-                      const parsed = parseISO(v);
-                      if (activityView === 'monthly') return format(parsed, 'MMMM yyyy');
-                      if (activityView === 'weekly') return `Week of ${format(parsed, 'MMM d, yyyy')}`;
-                      return format(parsed, 'EEEE, MMM d, yyyy');
-                    } catch {
-                      return String(v);
-                    }
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#00d4ff"
-                  strokeWidth={2.5}
-                  fill="url(#cyberActivityGrad)"
-                  activeDot={{ r: 5, fill: '#00d4ff', stroke: '#0a0f1a', strokeWidth: 2 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {activity && activity.data.length > 0 ? (
+              <div className="w-full h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={activity.data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="cyberActivityGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--color-cyan, #00d4ff)" stopOpacity={0.35} />
+                        <stop offset="95%" stopColor="var(--color-cyan, #00d4ff)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border, #1e2d4f)" opacity={0.6} />
+                    <XAxis
+                      dataKey="date"
+                      stroke="var(--color-border, #1e2d4f)"
+                      tick={{ fill: 'var(--color-text-secondary, #8fa3bf)', fontSize: 11, fontFamily: "'Times New Roman', Times, serif" }}
+                      tickFormatter={(d: string) => {
+                        try {
+                          const parsed = parseISO(d);
+                          if (activityView === 'monthly') return format(parsed, 'MMM yyyy');
+                          return format(parsed, 'MMM d');
+                        } catch {
+                          return String(d);
+                        }
+                      }}
+                    />
+                    <YAxis
+                      stroke="var(--color-border, #1e2d4f)"
+                      tick={{ fill: 'var(--color-text-secondary, #8fa3bf)', fontSize: 11, fontFamily: "'Times New Roman', Times, serif" }}
+                      allowDecimals={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--color-bg-card, #131d35)',
+                        borderColor: 'var(--color-border, #1e2d4f)',
+                        color: 'var(--color-text-primary, #e8edf5)',
+                        borderRadius: 12,
+                        boxShadow: 'var(--shadow-md, 0 10px 25px -5px rgba(0, 0, 0, 0.5))',
+                        fontFamily: "'Times New Roman', Times, serif",
+                      }}
+                      labelStyle={{ color: 'var(--color-text-secondary, #8fa3bf)', fontSize: 11, fontWeight: 700 }}
+                      itemStyle={{ color: 'var(--color-cyan, #00d4ff)', fontSize: 12, fontWeight: 600 }}
+                      formatter={(val: number) => [`${val} ${val === 1 ? 'scan' : 'scans'}`, 'Volume']}
+                      labelFormatter={(v: string) => {
+                        try {
+                          const parsed = parseISO(v);
+                          if (activityView === 'monthly') return format(parsed, 'MMMM yyyy');
+                          if (activityView === 'weekly') return `Week of ${format(parsed, 'MMM d, yyyy')}`;
+                          return format(parsed, 'EEEE, MMM d, yyyy');
+                        } catch {
+                          return String(v);
+                        }
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="count"
+                      stroke="var(--color-cyan, #00d4ff)"
+                      strokeWidth={2.5}
+                      fill="url(#cyberActivityGrad)"
+                      activeDot={{ r: 5, fill: 'var(--color-cyan, #00d4ff)', stroke: 'var(--color-bg-primary, #0a0f1a)', strokeWidth: 2 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="py-14 text-center text-xs text-[#8fa3bf] font-plex">
+                No analysis activity recorded in this period. Submit a text or URL to initiate telemetry.
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="py-14 text-center text-xs text-[#8fa3bf]">
-            No analysis activity recorded in this period. Submit a text or URL to initiate telemetry.
+        </Card>
+
+        {/* Statistical Threat Distribution Pie Chart (Right Column) */}
+        <Card className="dashboard-chart-card lg:col-span-5 p-6 border-[#1e2d4f] shadow-xl flex flex-col justify-between">
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-[#1e2d4f]">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-400">
+                  <PieIcon className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#e8edf5] text-sm font-space">
+                    Statistical Threat Distribution
+                  </h3>
+                  <p className="text-[11px] text-[#8fa3bf] font-plex">
+                    {pieMode === 'verdict' ? 'Verdict & credibility classification' : 'Risk & sensitivity classification'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Mode Toggle */}
+              <div className="chart-tab-group flex items-center gap-1 p-0.5 bg-[#0a0f1a] rounded-lg border border-[#1e2d4f] text-[10px] font-outfit self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => setPieMode('verdict')}
+                  className={`px-2.5 py-1 rounded font-medium transition-all ${
+                    pieMode === 'verdict'
+                      ? 'chart-tab-active bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm font-semibold'
+                      : 'chart-tab-inactive text-[#8fa3bf] hover:text-[#e8edf5]'
+                  }`}
+                >
+                  Verdict
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPieMode('sensitivity')}
+                  className={`px-2.5 py-1 rounded font-medium transition-all ${
+                    pieMode === 'sensitivity'
+                      ? 'chart-tab-active bg-violet-500/20 text-violet-300 border border-violet-500/40 shadow-sm font-semibold'
+                      : 'chart-tab-inactive text-[#8fa3bf] hover:text-[#e8edf5]'
+                  }`}
+                >
+                  Sensitivity
+                </button>
+              </div>
+            </div>
+
+            {pieChartData.length > 0 && totalCount > 0 ? (
+              <div className="flex flex-col items-center">
+                {/* Responsive Doughnut Container with Center Telemetry Badge */}
+                <div className="relative w-full h-56 sm:h-60 flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieChartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={58}
+                        outerRadius={88}
+                        paddingAngle={3}
+                        dataKey="value"
+                        onMouseEnter={(_, index) => setActivePieIndex(index)}
+                        onMouseLeave={() => setActivePieIndex(null)}
+                      >
+                        {pieChartData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={entry.color}
+                            stroke="var(--color-bg-card, #0f1629)"
+                            strokeWidth={activePieIndex === index ? 3 : 2}
+                            style={{
+                              filter: activePieIndex === index ? `drop-shadow(0 0 8px ${entry.color}80)` : 'none',
+                              transition: 'all 0.2s ease',
+                              cursor: 'pointer'
+                            }}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomPieTooltip />} />
+                    </PieChart>
+                  </ResponsiveContainer>
+
+                  {/* Absolute Centered Doughnut Hole Telemetry */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none text-center">
+                    <span className="pie-center-value text-2xl sm:text-3xl font-numeric font-extrabold text-[#e8edf5] leading-none tracking-tight">
+                      {totalCount}
+                    </span>
+                    <span className="pie-center-label text-[10px] font-rajdhani font-semibold text-[#8fa3bf] mt-1">
+                      {pieMode === 'verdict' ? 'Total Verdicts' : 'Total Scans'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Structured Enterprise Statistical Legend Table */}
+                <div className="w-full mt-2 pt-3 border-t border-[#1e2d4f]/60 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  {pieChartData.map((item, idx) => {
+                    const pct = totalCount > 0 ? ((item.value / totalCount) * 100).toFixed(1) : '0';
+                    const isHovered = activePieIndex === idx;
+                    return (
+                      <div
+                        key={item.name}
+                        onMouseEnter={() => setActivePieIndex(idx)}
+                        onMouseLeave={() => setActivePieIndex(null)}
+                        className={`pie-stat-legend-item flex flex-col gap-1 p-2 rounded-xl bg-[#0a0f1a]/60 border border-[#1e2d4f]/50 transition-all cursor-pointer ${
+                          isHovered ? 'border-cyan-400/60 bg-[#131d35] shadow-md' : ''
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1.5">
+                          <span className="flex items-center gap-1.5 truncate">
+                            <span
+                              className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
+                              style={{ backgroundColor: item.color }}
+                            />
+                            <span className="pie-stat-legend-name truncate text-[11px] font-space font-medium text-[#e8edf5]">
+                              {item.name}
+                            </span>
+                          </span>
+                          <span className="font-numeric font-bold text-xs shrink-0" style={{ color: item.color }}>
+                            {item.value} <span className="font-numeric font-normal text-[11px] text-[#8fa3bf]">({pct}%)</span>
+                          </span>
+                        </div>
+                        {/* Mini Proportion Progress Track */}
+                        <div className="w-full h-1 bg-[#1e2d4f]/50 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-300"
+                            style={{
+                              width: `${pct}%`,
+                              backgroundColor: item.color,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="py-14 text-center text-xs text-[#8fa3bf] font-plex">
+                No distribution data recorded yet. Submit text or url analyses to populate distribution telemetry.
+              </div>
+            )}
           </div>
-        )}
-      </Card>
+        </Card>
+      </div>
 
       {/* ── 4. Interactive Verdict & Sensitivity Distributions ──────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Verdict Distribution */}
-        <Card className="p-6 border-[#1e2d4f] shadow-xl">
+        <Card className="dashboard-chart-card p-6 border-[#1e2d4f] shadow-xl">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#1e2d4f]">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-cyan-400" />
-              <h3 className="font-bold text-[#e8edf5] text-sm">
+              <h3 className="font-bold text-[#e8edf5] text-sm font-space">
                 Verdict & Credibility Distribution
               </h3>
             </div>
             <Link
               to="/dashboard/history"
-              className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1"
+              className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 font-outfit"
             >
               Filter in History <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
 
           {assessmentEntries.length === 0 ? (
-            <p className="text-xs text-[#8fa3bf] py-8 text-center">
+            <p className="text-xs text-[#8fa3bf] py-8 text-center font-plex">
               No assessment verdicts recorded yet. Run an analysis to view breakdown.
             </p>
           ) : (
@@ -476,10 +726,10 @@ export default function DashboardOverview() {
                     title={`Click to filter history for "${verdict}"`}
                   >
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-[#e8edf5] font-semibold group-hover:text-cyan-300 transition-colors truncate max-w-[240px]">
+                      <span className="text-[#e8edf5] font-space font-medium group-hover:text-cyan-300 transition-colors truncate max-w-[240px]">
                         {verdict}
                       </span>
-                      <span className="text-[#8fa3bf] font-mono text-xs">
+                      <span className="text-[#8fa3bf] font-numeric text-xs font-bold">
                         {count} ({pct}%)
                       </span>
                     </div>
@@ -497,24 +747,24 @@ export default function DashboardOverview() {
         </Card>
 
         {/* Sensitivity & Risk Distribution */}
-        <Card className="p-6 border-[#1e2d4f] shadow-xl">
+        <Card className="dashboard-chart-card p-6 border-[#1e2d4f] shadow-xl">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#1e2d4f]">
             <div className="flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-violet-400" />
-              <h3 className="font-bold text-[#e8edf5] text-sm">
+              <h3 className="font-bold text-[#e8edf5] text-sm font-space">
                 Sensitivity & Risk Matrix
               </h3>
             </div>
             <Link
               to="/dashboard/history"
-              className="text-xs text-violet-400 hover:text-violet-300 font-medium flex items-center gap-1"
+              className="text-xs text-violet-400 hover:text-violet-300 font-medium flex items-center gap-1 font-outfit"
             >
               Filter in History <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
 
           {sensitivityEntries.length === 0 ? (
-            <p className="text-xs text-[#8fa3bf] py-8 text-center">
+            <p className="text-xs text-[#8fa3bf] py-8 text-center font-plex">
               No sensitivity findings recorded yet.
             </p>
           ) : (
@@ -535,10 +785,10 @@ export default function DashboardOverview() {
                     title={`Click to filter history for "${level}"`}
                   >
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-[#e8edf5] font-semibold uppercase font-mono group-hover:text-violet-300 transition-colors">
-                        {level} Sensitivity
+                      <span className="text-[#e8edf5] font-space font-medium group-hover:text-violet-300 transition-colors">
+                        {level.charAt(0).toUpperCase() + level.slice(1).toLowerCase()} Sensitivity
                       </span>
-                      <span className="text-[#8fa3bf] font-mono text-xs">
+                      <span className="text-[#8fa3bf] font-numeric text-xs font-bold">
                         {count} ({pct}%)
                       </span>
                     </div>
@@ -557,28 +807,32 @@ export default function DashboardOverview() {
       </div>
 
       {/* ── 5. Interactive Recent Analyses Feed ──────────────────────────────── */}
-      <Card className="p-6 border-[#1e2d4f] shadow-xl">
+      <Card className="dashboard-chart-card p-6 border-[#1e2d4f] shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-3 border-b border-[#1e2d4f]">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-lg bg-[#0f1629] border border-[#1e2d4f] text-cyan-400">
               <Clock className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-[#e8edf5] text-base">Recent Threat Analyses</h3>
-              <p className="text-xs text-[#8fa3bf]">Direct investigation audit trail</p>
+              <h3 className="font-bold text-[#e8edf5] text-base font-space">
+                Recent Threat Analyses
+              </h3>
+              <p className="text-xs text-[#8fa3bf] font-plex">
+                Direct investigation audit trail
+              </p>
             </div>
           </div>
 
           {/* Quick Filter Pill Buttons */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 p-1 bg-[#0a0f1a] rounded-xl border border-[#1e2d4f] font-outfit">
+            <div className="chart-tab-group flex items-center gap-1 p-1 bg-[#0a0f1a] rounded-xl border border-[#1e2d4f] font-outfit">
               <button
                 type="button"
                 onClick={() => setRecentFilter('all')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-outfit font-medium transition-colors ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-outfit transition-colors ${
                   recentFilter === 'all'
-                    ? 'bg-cyan-500/20 text-cyan-300 font-semibold'
-                    : 'text-[#8fa3bf] hover:text-[#e8edf5]'
+                    ? 'chart-tab-active bg-cyan-500/20 text-cyan-300 font-semibold'
+                    : 'chart-tab-inactive text-[#8fa3bf] hover:text-[#e8edf5]'
                 }`}
               >
                 All
@@ -586,10 +840,10 @@ export default function DashboardOverview() {
               <button
                 type="button"
                 onClick={() => setRecentFilter('url')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-outfit font-medium transition-colors ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-outfit transition-colors ${
                   recentFilter === 'url'
-                    ? 'bg-cyan-500/20 text-cyan-300 font-semibold'
-                    : 'text-[#8fa3bf] hover:text-[#e8edf5]'
+                    ? 'chart-tab-active bg-cyan-500/20 text-cyan-300 font-semibold'
+                    : 'chart-tab-inactive text-[#8fa3bf] hover:text-[#e8edf5]'
                 }`}
               >
                 URL Only
@@ -597,10 +851,10 @@ export default function DashboardOverview() {
               <button
                 type="button"
                 onClick={() => setRecentFilter('text')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-outfit font-medium transition-colors ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-outfit transition-colors ${
                   recentFilter === 'text'
-                    ? 'bg-cyan-500/20 text-cyan-300 font-semibold'
-                    : 'text-[#8fa3bf] hover:text-[#e8edf5]'
+                    ? 'chart-tab-active bg-cyan-500/20 text-cyan-300 font-semibold'
+                    : 'chart-tab-inactive text-[#8fa3bf] hover:text-[#e8edf5]'
                 }`}
               >
                 Text Only
@@ -618,11 +872,11 @@ export default function DashboardOverview() {
 
         {filteredRecentAnalyses.length === 0 ? (
           <EmptyState
-            title="No analyses found"
+            title="No Analyses Found"
             description="Submit a text passage or URL to begin tracking threats in your personal enclave."
             action={
               <Link to="/dashboard/analyze/text">
-                <Button size="sm" variant="primary" leftIcon={<PlusCircle className="w-4 h-4" />}>
+                <Button size="sm" variant="primary" leftIcon={<PlusCircle className="w-4 h-4" />} className="font-outfit">
                   Start Analysis
                 </Button>
               </Link>
@@ -630,9 +884,9 @@ export default function DashboardOverview() {
           />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm font-plex">
+            <table className="dashboard-recent-table w-full text-sm font-plex">
               <thead>
-                <tr className="border-b border-[#1e2d4f] text-[11px] font-rajdhani font-bold text-[#4a6180] uppercase tracking-wider">
+                <tr className="border-b border-[#1e2d4f] text-[11px] font-rajdhani font-semibold text-[#4a6180]">
                   <th className="text-left pb-3 pr-3">Record ID</th>
                   <th className="text-left pb-3 pr-4">Type</th>
                   <th className="text-left pb-3 pr-4">Target / Summary</th>
@@ -651,7 +905,7 @@ export default function DashboardOverview() {
                     className="hover:bg-white/5 transition-colors cursor-pointer group"
                     title="Click to view full threat dossier"
                   >
-                    <td className="py-3.5 pr-3 whitespace-nowrap font-rajdhani text-xs font-bold text-cyan-400 tracking-wider">
+                    <td className="py-3.5 pr-3 whitespace-nowrap font-numeric text-xs font-bold text-cyan-400 tracking-wider">
                       #TR-{String(a.id).padStart(5, '0')}
                     </td>
                     <td className="py-3.5 pr-4 whitespace-nowrap">
@@ -665,7 +919,7 @@ export default function DashboardOverview() {
                             <Globe className="w-3.5 h-3.5" />
                           </span>
                         )}
-                        <span className="capitalize text-[#e8edf5] font-sans">{a.analysis_type}</span>
+                        <span className="capitalize text-[#e8edf5] font-space font-medium text-xs">{a.analysis_type}</span>
                       </span>
                     </td>
 
@@ -680,7 +934,7 @@ export default function DashboardOverview() {
                     </td>
 
                     <td className="py-3.5 pr-4 whitespace-nowrap">
-                      <span className={`font-mono font-bold text-xs ${
+                      <span className={`font-numeric font-bold text-xs ${
                         a.credibility_score !== undefined
                           ? a.credibility_score >= 70
                             ? 'text-emerald-400'
@@ -697,12 +951,12 @@ export default function DashboardOverview() {
                       {sensitivityBadge(a.sensitivity_level)}
                     </td>
 
-                    <td className="py-3.5 pr-4 text-[#8fa3bf] text-xs font-mono whitespace-nowrap">
+                    <td className="py-3.5 pr-4 text-[#8fa3bf] text-xs font-numeric whitespace-nowrap">
                       {format(parseISO(a.created_at), 'MMM d, HH:mm')}
                     </td>
 
                     <td className="py-3.5 text-right whitespace-nowrap">
-                      <span className="inline-flex items-center text-xs text-cyan-400 group-hover:translate-x-1 transition-transform font-medium">
+                      <span className="inline-flex items-center text-xs text-cyan-400 group-hover:translate-x-1 transition-transform font-medium font-outfit">
                         Details <ChevronRight className="w-3.5 h-3.5" />
                       </span>
                     </td>

@@ -1,14 +1,15 @@
 // SOR SENTINEL — Auth Context
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import type { User } from '@/types';
+import type { User, SignupInitiateResponse } from '@/types';
 import { authApi, tokenStorage, extractErrorMessage } from '@/services/api';
 
 interface AuthContextValue {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
+  register: (data: RegisterData) => Promise<SignupInitiateResponse>;
+  completeSignupVerification: (email: string, otp: string) => Promise<User>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   updateUser: (user: User) => void;
@@ -44,16 +45,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string): Promise<User> => {
     const res = await authApi.login(email, password);
     tokenStorage.setTokens(res.data.access_token, res.data.refresh_token);
     setUser(res.data.user);
+    return res.data.user;
   }, []);
 
-  const register = useCallback(async (data: RegisterData) => {
+  const register = useCallback(async (data: RegisterData): Promise<SignupInitiateResponse> => {
     const res = await authApi.register(data);
+    return res.data;
+  }, []);
+
+  const completeSignupVerification = useCallback(async (email: string, otp: string): Promise<User> => {
+    const res = await authApi.verifySignupOtp(email, otp);
     tokenStorage.setTokens(res.data.access_token, res.data.refresh_token);
     setUser(res.data.user);
+    return res.data.user;
   }, []);
 
   const logout = useCallback(() => {
@@ -79,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         register,
+        completeSignupVerification,
         logout,
         refreshUser,
         updateUser: setUser,

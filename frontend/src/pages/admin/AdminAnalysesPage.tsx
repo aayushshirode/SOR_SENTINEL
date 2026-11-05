@@ -165,7 +165,7 @@ export default function AdminAnalysesPage() {
                       <td className="px-4 py-3.5 max-w-[200px] truncate text-xs text-[#e8edf5]">
                         {a.overall_assessment || '—'}
                       </td>
-                      <td className="px-4 py-3.5 text-center font-bold font-mono">
+                      <td className="px-4 py-3.5 text-center font-bold font-numeric">
                         {a.credibility_score != null ? (
                           <span
                             className={
@@ -191,7 +191,7 @@ export default function AdminAnalysesPage() {
                           <span className="text-xs text-[#4a6180]">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-3.5 text-right text-xs text-[#8fa3bf] whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-right text-xs text-[#8fa3bf] font-numeric whitespace-nowrap">
                         {new Date(a.created_at).toLocaleString()}
                       </td>
                     </tr>
@@ -203,7 +203,7 @@ export default function AdminAnalysesPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between text-xs text-[#8fa3bf]">
+            <div className="flex items-center justify-between text-xs text-[#8fa3bf] font-numeric">
               <div>
                 Showing page {page} of {totalPages} ({total} analyses total)
               </div>

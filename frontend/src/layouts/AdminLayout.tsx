@@ -31,7 +31,7 @@ export default function AdminLayout() {
     logout();
     setShowLogoutConfirm(false);
     toast.success('Logged out successfully.');
-    navigate('/signin');
+    navigate('/');
   };
 
   const handleCancelLogout = () => {
