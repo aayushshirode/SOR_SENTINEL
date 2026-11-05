@@ -165,3 +165,64 @@ def test_cubbis_clear_history_workflow(client: TestClient):
         )
         assert response.status_code == 200
         assert "5" in response.json()["message"]
+
+
+# ── Date Accuracy & Temporal Grounding Tests ─────────────────────────────────
+
+def test_cubbis_current_ist_datetime_properties():
+    """Verify that get_current_ist_datetime returns timezone-aware Asia/Kolkata (+05:30) datetime."""
+    from app.services.cubbis_service import get_current_ist_datetime
+    now_ist = get_current_ist_datetime()
+    assert now_ist.tzinfo is not None
+    # Offset must be +5 hours 30 minutes (19800 seconds)
+    offset = now_ist.utcoffset()
+    assert offset is not None
+    assert offset.total_seconds() == 19800
+    assert now_ist.year >= 2026
+    assert now_ist.strftime("%A") in [
+        "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+    ]
+
+
+def test_cubbis_system_instruction_contains_dynamic_date():
+    """System instruction dynamically contains current weekday, year, date and Asia/Kolkata timezone."""
+    from app.services.cubbis_service import build_cubbis_system_instruction, get_current_ist_datetime
+    system_inst = build_cubbis_system_instruction()
+    now_ist = get_current_ist_datetime()
+    current_year_str = str(now_ist.year)
+    current_weekday = now_ist.strftime("%A")
+
+    assert "TEMPORAL GROUNDING" in system_inst
+    assert "Asia/Kolkata" in system_inst
+    assert current_year_str in system_inst
+    assert current_weekday in system_inst
+    assert "NEVER claim, assume, or hallucinate that today is in 2024" in system_inst
+
+
+def test_cubbis_chat_temporal_context_forwarded_to_model():
+    """Verify that generate_cubbis_response passes temporal grounding in content to Gemini."""
+    from app.services.cubbis_service import get_current_ist_datetime
+    now_ist = get_current_ist_datetime()
+    current_year_str = str(now_ist.year)
+    current_weekday = now_ist.strftime("%A")
+
+    with patch("app.services.cubbis_service.get_gemini_client") as mock_client:
+        mock_instance = MagicMock()
+        mock_response = MagicMock()
+        mock_response.text = f"Today is {current_weekday}, {now_ist.strftime('%B %d, %Y')}."
+        mock_instance.models.generate_content.return_value = mock_response
+        mock_client.return_value = mock_instance
+
+        from app.services.cubbis_service import generate_cubbis_response
+        import asyncio
+
+        result = asyncio.run(generate_cubbis_response(user_message="What is today's date?"))
+        assert result["status"] == "success"
+        assert current_year_str in result["content"]
+
+        # Verify system_instruction in config contained dynamic grounding
+        call_args = mock_instance.models.generate_content.call_args
+        config_passed = call_args.kwargs.get("config")
+        assert config_passed is not None
+        assert "Asia/Kolkata" in config_passed.system_instruction
+        assert current_year_str in config_passed.system_instruction

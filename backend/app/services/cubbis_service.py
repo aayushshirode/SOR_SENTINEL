@@ -3,6 +3,7 @@ SOR SENTINEL — Cubbis AI Cyber Assistant Service
 Integrates with Google Gemini API via official google-genai SDK.
 Provides practical, protective cybersecurity education and incident response advice.
 """
+from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Optional, Any
 import structlog
 from google import genai
@@ -14,7 +15,48 @@ from app.core.config import get_settings
 logger = structlog.get_logger(__name__)
 settings = get_settings()
 
-CUBBIS_SYSTEM_INSTRUCTION = """You are Cubbis, an expert AI Cyber Assistant built into SOR SENTINEL — an advanced cybersecurity, threat analysis, and document protection platform.
+
+def get_current_ist_datetime() -> datetime:
+    """
+    Dynamically obtain the current date and time using Python's timezone-aware
+    datetime for Asia/Kolkata (IST, UTC+05:30).
+    Robustly handles environments with or without IANA tzdata package.
+    """
+    try:
+        from zoneinfo import ZoneInfo
+        return datetime.now(ZoneInfo("Asia/Kolkata"))
+    except Exception:
+        # Fallback to strict UTC+05:30 offset (Indian Standard Time has no DST)
+        ist_tz = timezone(timedelta(hours=5, minutes=30), name="IST")
+        return datetime.now(ist_tz)
+
+
+def build_cubbis_system_instruction() -> str:
+    """
+    Dynamically construct the Cubbis system instruction with authoritative real-time
+    temporal grounding for the current date, time, weekday, and year in Asia/Kolkata.
+    """
+    now_ist = get_current_ist_datetime()
+    current_date_str = now_ist.strftime("%B %d, %Y")
+    current_weekday = now_ist.strftime("%A")
+    current_time_str = now_ist.strftime("%I:%M %p")
+    current_year = str(now_ist.year)
+    iso_date = now_ist.strftime("%Y-%m-%d")
+
+    return f"""You are Cubbis, an expert AI Cyber Assistant built into SOR SENTINEL — an advanced cybersecurity, threat analysis, and document protection platform.
+
+TEMPORAL GROUNDING & CURRENT REAL-WORLD CLOCK (AUTHORITATIVE & NON-NEGOTIABLE):
+- CURRENT REAL-WORLD DATE: {current_weekday}, {current_date_str} (ISO: {iso_date})
+- CURRENT YEAR: {current_year}
+- CURRENT TIME: {current_time_str} IST
+- TIMEZONE: Asia/Kolkata (Indian Standard Time, UTC+05:30)
+
+STRICT DATE & TEMPORAL REASONING RULES:
+1. TODAY'S DATE IS {current_weekday.upper()}, {current_date_str.upper()}. The current year is strictly {current_year}.
+2. NEVER claim, assume, or hallucinate that today is in 2024, 2025, or any other outdated year. Your internal pretraining cutoff is NOT today's date. The current real-world timestamp provided above is the absolute ground truth for all temporal context.
+3. If the user asks about today's date, day, month, year, or current time, you MUST state clearly and unequivocally: {current_weekday}, {current_date_str}.
+4. When analyzing suspicious messages, interview dates, phishing timelines, job offers, or certificate expiries (e.g. an interview or event on 15/11/2026 or November 15, 2026), perform all calculations using {current_date_str} ({current_year}) as the baseline reference point. For instance, November 15, 2026 is only 10 days away from November 5, 2026 — it is NOT 2 years away. Never cite outdated years or make false claims about distant future years when evaluating dates.
+5. All temporal reasoning (e.g., 'yesterday', 'tomorrow', 'next week', 'years ago') must strictly anchor to {current_date_str}.
 
 Your primary mission is to provide practical, educational, actionable, and protective cybersecurity guidance to individuals and organizations.
 
@@ -110,8 +152,15 @@ async def generate_cubbis_response(
                     )
                 )
 
+    now_ist = get_current_ist_datetime()
+    current_date_str = now_ist.strftime("%B %d, %Y")
+    current_weekday = now_ist.strftime("%A")
+    current_year = str(now_ist.year)
+
+    temporal_context = f"[System Temporal Reference: Today is {current_weekday}, {current_date_str} IST ({current_year})]\n\n"
+
     # Append current user message with context and language guidance
-    current_prompt = f"{user_message.strip()}{context_prompt}{lang_prompt}"
+    current_prompt = f"{temporal_context}{user_message.strip()}{context_prompt}{lang_prompt}"
     contents.append(
         types.Content(
             role="user",
@@ -120,8 +169,8 @@ async def generate_cubbis_response(
     )
 
     config = types.GenerateContentConfig(
-        system_instruction=CUBBIS_SYSTEM_INSTRUCTION,
-        temperature=0.4,  # Lower temperature for accurate, grounded security advice
+        system_instruction=build_cubbis_system_instruction(),
+        temperature=0.3,  # Grounded, accurate responses
         top_p=0.9,
         max_output_tokens=2048,
     )
