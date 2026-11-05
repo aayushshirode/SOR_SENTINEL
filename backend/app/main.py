@@ -128,6 +128,7 @@ app.add_middleware(SlowAPIMiddleware)
 _configured_origins = [o.strip() for o in settings.FRONTEND_ORIGIN.split(",") if o.strip()]
 _cors_origins = list({
     *_configured_origins,
+    "https://sor-sentinel.netlify.app",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:5174",
