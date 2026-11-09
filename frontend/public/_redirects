@@ -1,2 +1,3 @@
-/login    /signin         301!
-/*        /index.html     200
+/login    /signin                                                                     301!
+/api/*    https://refine-annotation-microphone-delaware.trycloudflare.com/api/:splat   200!
+/*        /index.html                                                                 200
