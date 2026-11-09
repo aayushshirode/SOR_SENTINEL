@@ -11,7 +11,14 @@
 [context.production]
   command = "npm run build"
 
-# SPA client-side routing fallback (prevents 404 on page reload/refresh)
+# Redirect /login to canonical /signin
+[[redirects]]
+  from = "/login"
+  to = "/signin"
+  status = 301
+  force = true
+
+# SPA client-side routing fallback (prevents 404 on direct URL access/page reload/refresh)
 [[redirects]]
   from = "/*"
   to = "/index.html"

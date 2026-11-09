@@ -61,6 +61,7 @@ export function extractErrorMessage(error: unknown): string {
     }
     if (typeof data?.detail === 'string') return data.detail;
     if (error.code === 'ERR_NETWORK') return 'Cannot connect to server. Is the backend running?';
+    if (error.response?.status === 404) return 'Cannot reach backend API (404 Not Found). Please verify the backend is running.';
     if (error.code === 'ECONNABORTED') return 'Request timed out. Please try again.';
   }
   if (error instanceof Error) return error.message;
