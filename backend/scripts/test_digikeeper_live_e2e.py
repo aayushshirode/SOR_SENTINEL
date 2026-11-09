@@ -12,7 +12,7 @@ import httpx
 from sqlalchemy import text
 from app.db.database import SessionLocal
 
-BASE_URL = "http://127.0.0.1:8000/api/v1"
+BASE_URL = "http://127.0.0.1:8010/api/v1"
 
 def print_separator(title: str):
     print("\n" + "=" * 70)

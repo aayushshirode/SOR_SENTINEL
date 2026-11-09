@@ -160,9 +160,9 @@ python -m pytest tests/ -v
 
 5. Launch the FastAPI server:
 ```bash
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8010
 ```
-API Documentation will be available at: `http://localhost:8000/docs`
+API Documentation will be available at: `http://localhost:8010/docs`
 
 ---
 
