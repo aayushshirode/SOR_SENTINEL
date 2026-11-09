@@ -25,14 +25,29 @@ from sqlalchemy import URL, create_engine, event, text
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
 # ── Engine ───────────────────────────────────────────────────────────────────
+_dsn = settings.ORACLE_DSN.strip() if settings.ORACLE_DSN else "localhost:1521/XEPDB1"
+_host = "localhost"
+_port = 1521
+_service_name = "XEPDB1"
+
+if "/" in _dsn:
+    _host_port, _service_name = _dsn.split("/", 1)
+    if ":" in _host_port:
+        _host, _port_str = _host_port.split(":", 1)
+        try:
+            _port = int(_port_str)
+        except ValueError:
+            _port = 1521
+    else:
+        _host = _host_port
 
 DATABASE_URL = URL.create(
     "oracle+oracledb",
     username=settings.ORACLE_USER,
     password=settings.ORACLE_PASSWORD,
-    host="localhost",
-    port=1521,
-    query={"service_name": "XEPDB1"},
+    host=_host,
+    port=_port,
+    query={"service_name": _service_name},
 )
 
 
